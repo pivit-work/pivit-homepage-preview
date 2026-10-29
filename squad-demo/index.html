@@ -87,6 +87,239 @@ const { useState, useEffect, useMemo, useRef } = React;
 const P = window.PIVIT;
 const T = { font: "'Pretendard','Noto Sans KR',sans-serif" };
 const SQUADS = [{"color": "#4F6AF5"}, {"color": "#8B5CF6"}, {"color": "#F59E0B"}, {"color": "#22C55E"}];
+const orgDisplayName = (u) => (!u ? "" : u.displayName ? u.displayName : (u.nickname && u.nickname !== u.name) ? `${u.nickname}(${u.name})` : (u.name || u.nickname || ""));
+function OrgAvatar({ node, size = 24 }) {
+  const P = window.PIVIT;
+  return (
+    <div style={{ width: size, height: size, borderRadius: 9999, flexShrink: 0, background: node.color || P.color.sub, color: P.color.onBrand,
+      display: "flex", alignItems: "center", justifyContent: "center", fontSize: Math.round(size * 0.38), fontWeight: 700, overflow: "hidden" }}>
+      {node.photo ? <img src={node.photo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (node.avatar || (node.name || "?").slice(0, 2))}
+    </div>
+  );
+}
+function OrgBadge({ bg, children, title }) {
+  const P = window.PIVIT;
+  return <span title={title} style={{ padding: "0 6px", borderRadius: 6, background: bg, color: P.color.onBrand, fontSize: 12, lineHeight: "18px", fontWeight: 700, flexShrink: 0 }}>{children}</span>;
+}
+const ORG_MEMBER_SORT = "job_level";
+const orgMemberRank = (p, key) => {
+  if (key !== "job_level") return -1;
+  const n = parseInt(String(p.jobLevel || "").replace(/\D/g, ""), 10);
+  return Number.isFinite(n) ? n : -1;
+};
+const orgMemberCompare = (unit, key = ORG_MEMBER_SORT) => {
+  const slot = (p) => { const i = unit?.memberOrder ? unit.memberOrder.indexOf(p.id) : -1; return i < 0 ? Number.MAX_SAFE_INTEGER : i; };
+  const nameOf = (p) => (p.nickname && p.nickname !== p.name ? `${p.nickname}(${p.name})` : p.name);
+  return (a, b) =>
+    ((a.id === unit?.headId) !== (b.id === unit?.headId) ? (a.id === unit?.headId ? -1 : 1) : 0)
+    || (slot(a) - slot(b))
+    || (orgMemberRank(b, key) - orgMemberRank(a, key))
+    || nameOf(a).localeCompare(nameOf(b), "ko");
+};
+function deriveOrgFromUnits(root, units) {
+  const UNITS = units;
+  const _flat = (n, parentId = null, acc = []) => { acc.push({ ...n, _parentId: parentId }); (n.children || []).forEach(c => _flat(c, n.id, acc)); return acc; };
+  const PEOPLE = _flat(root).map(({ children, _parentId, ...p }) => ({ ...p, children: [], _orgParentId: _parentId }));
+  const TEAM_TO_UNIT = Object.fromEntries(UNITS.flatMap(u => u.teams.map(t => [t, u.id])));
+  const unitOf = (p) => (p.isCeo ? null : (TEAM_TO_UNIT[p.team] || null));
+  const unitById = (id) => UNITS.find(u => u.id === id);
+  const unitChildren = (parentId) => UNITS.filter(u => u.parentId === parentId);
+  const unitMembers = (unitId) => PEOPLE.filter(p => unitOf(p) === unitId);
+  const unitOfPath = (path) => TEAM_TO_UNIT[String(path || "").split("›").pop().trim()] || null;
+  const unitConcurrent = (unitId) => PEOPLE.filter(p =>
+    unitOf(p) !== unitId && (p.affiliations || []).some(a => !a.isPrimary && unitOfPath(a.path) === unitId)
+  ).length;
+  const reportTargetOf = (unitId, exceptId = null) => {
+  let u = unitById(unitId);
+  while (u) { if (u.headId && u.headId !== exceptId) return u.headId; u = u.parentId ? unitById(u.parentId) : null; }
+  return "ceo";
+  };
+  const derivedManagerOf = (p) => {
+  if (p.isCeo) return null;
+  const uid = unitOf(p);
+  if (!uid) return p.managerId || p._orgParentId || "ceo";
+  const u = unitById(uid);
+  return u.headId === p.id ? reportTargetOf(u.parentId || null) : reportTargetOf(uid, p.id);
+  };
+  PEOPLE.forEach(p => { p.managerId = derivedManagerOf(p); p.isDirectReport = !p.isCeo && !unitOf(p); p.isHead = UNITS.some(u => u.headId === p.id); });
+  PEOPLE.forEach(p => { p.children = PEOPLE.filter(c => c.managerId === p.id); });
+  const ORG_DERIVED = PEOPLE.find(p => p.isCeo);
+  const personById = (id) => PEOPLE.find(p => p.id === id);
+  const UNIT_TREE = { id: "__root__", children: (function build(pid) { return unitChildren(pid).map(u => ({ id: u.id, hasContent: unitMembers(u.id).length > 0 || unitChildren(u.id).length > 0, children: build(u.id) })); })(null) };
+  return { UNITS, PEOPLE, ORG_DERIVED, UNIT_TREE, unitOf, unitById, unitChildren, unitMembers, unitConcurrent, personById, reportTargetOf, derivedManagerOf };
+}
+const orgInitialCollapsed = (node, depth = 0, acc = new Set()) => {
+  if (depth >= 1 && ((node.children || []).length > 0 || node.hasContent)) acc.add(node.id);
+  (node.children || []).forEach(c => orgInitialCollapsed(c, depth + 1, acc));
+  return acc;
+};
+const ORG_HGAP = 20, ORG_VGAP = 56;
+const ORG_UNIT_W = 240, ORG_DIRECT_STUB_Y = 34;
+const ORG_CARD_SHADOW = "rgba(10,13,18,.1) 0 1px 3px 0", ORG_CARD_RADIUS = 12;
+const ORG_P = () => window.PIVIT;
+const orgConnectorPath = (pct, style) => (style === "ortho" ? `M 50 0 V 50 H ${pct} V 100` : `M 50 0 C 50 50, ${pct} 50, ${pct} 100`);
+function Connectors({ n, lineStyle = "curve" }) {
+  const P = ORG_P();
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: "absolute", top: -ORG_VGAP, left: 0, right: 0, width: "100%", height: ORG_VGAP, overflow: "visible", pointerEvents: "none" }}>
+      {Array.from({ length: n }, (_, i) => { const pct = n === 1 ? 50 : (i / (n - 1)) * 100;
+        return <path key={i} d={orgConnectorPath(pct, lineStyle)} fill="none" stroke={P.color.border} strokeWidth="1" vectorEffect="non-scaling-stroke" strokeLinejoin="round" />; })}
+    </svg>
+  );
+}
+const OrgFreeDragCtx = React.createContext(null);
+const orgDragStyle = (drag, id) => { const o = drag?.offsets[id]; return o && (o.x || o.y) ? { transform: `translate(${o.x}px, ${o.y}px)` } : null; };
+const orgDragDown = (drag, id) => (drag ? (e) => drag.start(id, e) : undefined);
+function OrgChildRow({ lineStyle = "curve", marginTop = ORG_VGAP, children }) {
+  const P = ORG_P();
+  const ref = useRef(null); const [m, setM] = useState(null);
+  const measure = () => {
+    const row = ref.current; if (!row) return;
+    const parentCard = row.parentElement ? row.parentElement.querySelector("[data-card]") : null;
+    const rr = row.getBoundingClientRect(); const k = rr.width ? row.offsetWidth / rr.width : 1;
+    const cx = (el) => { const r = el.getBoundingClientRect(); return Math.round((r.left + r.width / 2 - rr.left) * k); };
+    const cols = Array.from(row.children).filter(el => el.hasAttribute("data-col"));
+    const cy = (el) => Math.round((el.getBoundingClientRect().top - rr.top) * k);
+    const next = { w: row.offsetWidth, px: parentCard ? cx(parentCard) : Math.round(row.offsetWidth / 2), cs: cols.map(c => { const card = c.querySelector("[data-card]"); return { x: cx(card || c), y: cy(card || c), hl: c.hasAttribute("data-hl") }; }) };
+    setM(prev => (prev && JSON.stringify(prev) === JSON.stringify(next) ? prev : next));
+  };
+  useEffect(measure);
+  useEffect(() => { window.addEventListener("resize", measure); return () => window.removeEventListener("resize", measure); }, []);
+  const d = (px, cx, dy = 0) => { const ey = marginTop + dy, my = ey / 2;
+    return lineStyle === "ortho" ? `M ${px} 0 V ${my} H ${cx} V ${ey}` : `M ${px} 0 C ${px} ${my}, ${cx} ${my}, ${cx} ${ey}`; };
+  return (
+    <div ref={ref} style={{ marginTop, position: "relative", display: "flex", gap: ORG_HGAP, alignItems: "flex-start" }}>
+      {m && (
+        <svg width={m.w} height={marginTop} style={{ position: "absolute", top: -marginTop, left: 0, overflow: "visible", pointerEvents: "none" }}>
+          {[...m.cs].sort((a, b) => a.hl - b.hl).map((c, i) => <path key={i} d={d(m.px, c.x, c.y)} fill="none" stroke={c.hl ? P.color.brand : P.color.border} strokeWidth={c.hl ? 2 : 1} strokeLinejoin="round" />)}
+        </svg>
+      )}
+      {children}
+    </div>
+  );
+}
+function LineStyleButton({ lineStyle, onChange, size = 36 }) {
+  const P = ORG_P();
+  return (
+    <button onClick={() => onChange(lineStyle === "ortho" ? "curve" : "ortho")} title={`연결선: ${lineStyle === "ortho" ? "직각" : "곡선"} — 클릭하면 ${lineStyle === "ortho" ? "곡선" : "직각"}으로`}
+      style={{ width: size, height: size, borderRadius: P.radius.md, border: "none", background: P.color.bg, color: P.color.sub, cursor: "pointer", fontSize: 15, boxShadow: "rgba(10,13,18,.08) 0 4px 6px -1px" }}>
+      {lineStyle === "ortho" ? "⌐" : "⌒"}
+    </button>
+  );
+}
+function DirectSlot({ people, onOpenCard }) {
+  const P = ORG_P();
+  if (!people.length) return null;
+  return (
+    <div style={{ marginTop: 14, position: "relative", display: "flex", flexDirection: "column", gap: 6, alignItems: "stretch", minWidth: 190, maxWidth: 240 }}>
+      <div style={{ position: "absolute", top: -14, left: "50%", width: 0, height: 14, borderLeft: `1px dashed ${P.color.border}` }} />
+      <div style={{ fontSize: 11, lineHeight: "16px", fontWeight: 600, color: P.color.muted, textAlign: "center" }}>직속 {people.length}명</div>
+      {people.map(dr => (
+        <div key={dr.id} onClick={() => onOpenCard(dr)} title={`${orgDisplayName(dr)} — ${dr.title} · 직속 보고`}
+          style={{ display: "flex", alignItems: "center", gap: 8, background: P.color.card, borderRadius: 10, padding: "8px 12px", boxShadow: ORG_CARD_SHADOW, cursor: "pointer", borderLeft: `2px dashed ${P.color.border}` }}>
+          <OrgAvatar node={dr} size={24} />
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 13, lineHeight: "18px", fontWeight: 600, color: P.color.strong, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{orgDisplayName(dr)}</div>
+            <div style={{ fontSize: 11, lineHeight: "15px", color: P.color.muted, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{dr.title}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+function UnitCard({ unit, derived, renderPerson, onOpenCard, collapsed, onToggle, depth, lineStyle = "curve", highlight }) {
+  const P = ORG_P();
+  const { unitMembers, unitChildren, unitConcurrent, PEOPLE } = derived;
+  const members = [...unitMembers(unit.id)].sort(orgMemberCompare(unit));
+  const kids = unitChildren(unit.id);
+  const directs = unit.headId ? PEOPLE.filter(p => p.isDirectReport && p.managerId === unit.headId) : [];
+  const dual = unitConcurrent(unit.id);
+  const isCollapsed = collapsed?.has(unit.id);
+  const total = members.length + kids.length;
+  const drag = React.useContext(OrgFreeDragCtx);
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative", ...orgDragStyle(drag, unit.id) }}>
+      <div data-card="" onMouseDown={orgDragDown(drag, unit.id)} style={{ position: "relative", background: P.color.infoBg, borderRadius: ORG_CARD_RADIUS, padding: "20px 22px", width: ORG_UNIT_W, boxSizing: "border-box", boxShadow: ORG_CARD_SHADOW }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ fontSize: 18, lineHeight: "28px", fontWeight: 700, color: P.color.strong, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{unit.name}</div>
+          {unit.isStaff && <OrgBadge bg={P.color.sub} title="대표 직속 조직(별도 레벨) — 라인 조직과 다른 레벨. 어떤 단위든 몇 개든 올 수 있다(2026-09-07 David)">대표 직속</OrgBadge>}
+        </div>
+        {unit.labelName && <div style={{ fontSize: 16, lineHeight: "24px", fontWeight: 500, color: P.color.sub }}>{unit.labelName}</div>}
+        <div style={{ fontSize: 16, lineHeight: "24px", fontWeight: 500, color: P.color.infoText }}>
+          직속 {members.length}명{dual > 0 ? ` +${dual} 겸직` : ""}
+        </div>
+        {total > 0 && (
+          <div onClick={(e) => { e.stopPropagation(); onToggle?.(unit.id); }}
+            title={isCollapsed ? `하위 ${total}개 펼치기` : `하위 ${total}개 접기`}
+            style={{ position: "absolute", bottom: -8, left: "50%", transform: "translateX(-50%)", width: 16, height: 16, borderRadius: "50%",
+              background: isCollapsed ? P.color.infoText : P.color.card, border: `1.5px solid ${P.color.infoText}`, display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 9, color: isCollapsed ? P.color.onBrand : P.color.infoText, fontWeight: 800, cursor: "pointer", transition: "background .15s, color .15s", boxShadow: ORG_CARD_SHADOW }}>{total}</div>
+        )}
+      </div>
+      <DirectSlot people={directs} onOpenCard={onOpenCard} />
+      {total > 0 && !isCollapsed && (
+        <OrgChildRow lineStyle={lineStyle}>
+          {members.map(m => (
+            <div key={m.id} data-col="" data-hl={highlight?.has(m.id) ? "" : undefined} style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+              <div data-card="" onMouseDown={orgDragDown(drag, m.id)} style={{ display: "inline-block", ...orgDragStyle(drag, m.id) }}>{renderPerson(m, depth + 1)}</div>
+            </div>
+          ))}
+          {kids.map(k => <div key={k.id} data-col="" data-hl={highlight?.has(k.id) ? "" : undefined}><UnitCard unit={k} derived={derived} renderPerson={renderPerson} onOpenCard={onOpenCard} collapsed={collapsed} onToggle={onToggle} depth={depth + 1} lineStyle={lineStyle} highlight={highlight} /></div>)}
+        </OrgChildRow>
+      )}
+    </div>
+  );
+}
+function OrgUnitTreeView({ derived, renderPerson, onOpenCard, collapsed, onToggle, company = "피빗", lineStyle = "curve", highlight }) {
+  const P = ORG_P();
+  const { ORG_DERIVED, PEOPLE, unitChildren, unitOf } = derived;
+  const ceo = ORG_DERIVED;
+  const allRoots = unitChildren(null);
+  const roots = allRoots.filter(u => !u.isStaff);
+  const staffUnits = allRoots.filter(u => u.isStaff);
+  const headTotal = PEOPLE.length, headDual = PEOPLE.filter(p => Array.isArray(p.affiliations) && p.affiliations.length > 1).length;
+  const directs = PEOPLE.filter(p => p.isDirectReport && p.managerId === "ceo");
+  const unassigned = PEOPLE.filter(p => !p.isCeo && !unitOf(p) && !p.isDirectReport);
+  const drag = React.useContext(OrgFreeDragCtx);
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative", ...orgDragStyle(drag, "__root__") }}>
+      <div data-card="" onMouseDown={orgDragDown(drag, "__root__")} style={{ position: "relative", background: P.color.brandFaint, borderRadius: ORG_CARD_RADIUS, padding: "20px 22px", width: ORG_UNIT_W, boxSizing: "border-box", boxShadow: ORG_CARD_SHADOW }}>
+        <div style={{ fontSize: 18, lineHeight: "28px", fontWeight: 700, color: P.color.strong }}>🏢 {company}</div>
+        {ceo ? (
+          <div onClick={() => onOpenCard(ceo)} title="대표 — 클릭하면 퍼블릭 카드" style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6, cursor: "pointer" }}>
+            <OrgAvatar node={ceo} size={32} />
+            <span style={{ fontSize: 16, lineHeight: "24px", fontWeight: 600, color: P.color.strong }}>{orgDisplayName(ceo)}</span>
+            <OrgBadge bg={P.color.warning} title="대표(CEO) — 조직도 최상위">대표</OrgBadge>
+          </div>
+        ) : (
+          <div style={{ fontSize: 16, lineHeight: "24px", fontWeight: 500, color: P.color.sub, marginTop: 6 }}>대표 미지정</div>
+        )}
+        <div style={{ fontSize: 16, lineHeight: "24px", fontWeight: 500, color: P.color.brandText }}>
+          구성원 {headTotal}명{headDual > 0 ? ` +${headDual} 겸직` : ""}{unassigned.length > 0 ? ` · 미배정 ${unassigned.length}` : ""}
+        </div>
+      </div>
+      <DirectSlot people={directs} onOpenCard={onOpenCard} />
+      {staffUnits.length > 0 && (
+        <div style={{ width: 0, flexShrink: 0, position: "relative" }}>
+          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, borderLeft: `1px solid ${P.color.border}`, pointerEvents: "none" }} />
+          <div style={{ width: "max-content", paddingTop: 12 }}>
+            {staffUnits.map((u, i) => (
+              <div key={u.id} style={{ position: "relative", marginLeft: 28, marginTop: i === 0 ? 0 : 12 }}>
+                <div style={{ position: "absolute", top: ORG_DIRECT_STUB_Y, left: -28, width: 28, borderTop: highlight?.has(u.id) ? `2px solid ${P.color.brand}` : `1px solid ${P.color.border}`, pointerEvents: "none" }} />
+                <UnitCard unit={u} derived={derived} renderPerson={renderPerson} onOpenCard={onOpenCard} collapsed={collapsed} onToggle={onToggle} depth={1} lineStyle={lineStyle} highlight={highlight} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {roots.length > 0 && (
+        <OrgChildRow lineStyle={lineStyle}>
+          {roots.map(u => <div key={u.id} data-col="" data-hl={highlight?.has(u.id) ? "" : undefined}><UnitCard unit={u} derived={derived} renderPerson={renderPerson} onOpenCard={onOpenCard} collapsed={collapsed} onToggle={onToggle} depth={1} lineStyle={lineStyle} highlight={highlight} /></div>)}
+        </OrgChildRow>
+      )}
+    </div>
+  );
+}
 const ISO = { cos: 0.866, sin: 0.5, pad: 12, gapX: 48, gapY: 120, rowW: 1000, slab: 10, lift: 56, cell: 88, cs: 20, ch: 16, cardW: 96, cardH: 34 };
 const isoP = (x, y, z = 0) => [(x - y) * ISO.cos, (x + y) * ISO.sin - z];
 const isoPts = arr => arr.map(([x, y, z]) => isoP(x, y, z).map(v => v.toFixed(1)).join(",")).join(" ");
@@ -96,7 +329,7 @@ const MORPH_FAMILIES = [
   { key: "design", label: "디자인", color: P.color.roleText },
   { key: "pm", label: "기획", color: P.color.brand },
   { key: "biz", label: "마케팅·영업", color: P.color.warning },
-  { key: "ops", label: "경영지원", color: P.color.sub },   // [v3.34] 원색 빨강(errorText) → 중립 회색 — 톤앤매너(오류로 읽히지 않게)
+  { key: "ops", label: "경영지원", color: P.color.sub },
 ];
 const MORPH_DEMO_100 = (() => {
   const TEAMS = [["dev", "프론트엔드", 10], ["dev", "백엔드", 12], ["dev", "모바일", 8], ["dev", "데이터", 7], ["dev", "QA", 5],
@@ -110,12 +343,12 @@ const MORPH_DEMO_100 = (() => {
   const persons = []; let n = 0;
   TEAMS.forEach(([fam, , size], ti) => { for (let k = 0; k < size; k++, n++) {
     const giv = GIV[(n * 7 + 3) % GIV.length];
-    persons.push({ id: `p${n}`, name: SUR[n % SUR.length] + giv, avatar: giv, teamId: `t${ti}`, family: fam, title: TITLE[ti], head: k === 0 });   // 팀 첫 사람 = 팀장
+    persons.push({ id: `p${n}`, name: SUR[n % SUR.length] + giv, avatar: giv, teamId: `t${ti}`, family: fam, title: TITLE[ti], head: k === 0 });
   } });
   const pool = {}; MORPH_FAMILIES.forEach(f => { pool[f.key] = persons.filter(p => p.family === f.key); });
   const cursor = {}; let picks = 0;
   const take = fam => { const list = pool[fam]; cursor[fam] = (cursor[fam] || 0); picks++;
-    if (picks % 7 === 0) return list[(cursor[fam] + 3) % list.length];          // 7번에 한 번은 이미 뽑힌 사람 — 여러 스쿼드 겸임
+    if (picks % 7 === 0) return list[(cursor[fam] + 3) % list.length];
     return list[(cursor[fam]++) % list.length]; };
   const COLORS = SQUADS.map(sq => sq.color);
   const SPEC = [["결제 리뉴얼", { pm: 1, dev: 7, design: 2, biz: 1 }], ["모바일 앱 2.0", { pm: 1, dev: 8, design: 2 }], ["데이터 플랫폼", { pm: 1, dev: 6 }],
@@ -162,7 +395,7 @@ function SquadIsoStage({ to, animate, overlay, squads, scaleMode, onScale, onDon
   const play = !!animate && !reduce;
   const from = to === "squad" ? "org" : "squad";
   const [phase, setPhase] = useState(play ? "play" : "done");
-  const [up, setUp] = useState(play ? from : to);     // 지금 솟아 있는 판 — org(팀) | squad(스쿼드) | none(둘 다 가라앉음)
+  const [up, setUp] = useState(play ? from : to);
   const [leaving, setLeaving] = useState(false);
   const [hov, setHov] = useState(null);
   const [zoom, setZoom] = useState(1);
@@ -172,7 +405,7 @@ function SquadIsoStage({ to, animate, overlay, squads, scaleMode, onScale, onDon
   const famOf = k => MORPH_FAMILIES.find(f => f.key === k) || MORPH_FAMILIES[0];
   const personOf = pid => data.persons.find(x => x.id === pid);
   const teamOf = id => data.teams.find(x => x.id === id);
-  const cell = ISO.cell, cs = ISO.cs, chh = ISO.ch;   // 칸 · 블록 한 변 · 블록 높이
+  const cell = ISO.cell, cs = ISO.cs, chh = ISO.ch;
   const teamMembers = data.teams.map(t => data.persons.filter(p => p.teamId === t.id)
     .sort((a, b) => (b.head - a.head)).map(p => ({ pid: p.id, lead: false })));
   const inSquad = new Set(data.squads.flatMap(sq => sq.members.map(m => m.pid)));
@@ -353,7 +586,7 @@ function SquadIsoStage({ to, animate, overlay, squads, scaleMode, onScale, onDon
               const team = teamOf(tk.p.teamId);
               const role = isHead ? (onSquadFloor ? "리드" : "팀장") : "";
               const line2 = onSquadFloor ? (team ? team.name : "") : (tk.p.title || (team ? team.name : ""));
-              const cy = -bh - h2 - 9 - CH;   // 이름표 윗변 — 블록 꼭대기 위 9px(꼭지 자리)
+              const cy = -bh - h2 - 9 - CH;
               return (
                 <g key={tk.key} data-iso-cube={tk.key} ref={el => { nodes.current[tk.key] = el; }} transform={`translate(${sx.toFixed(1)} ${sy.toFixed(1)})`}
                   opacity={dim} onMouseEnter={() => phase === "done" && setHov(tk.pid)} onMouseLeave={() => setHov(null)}
@@ -398,10 +631,74 @@ function SquadIsoStage({ to, animate, overlay, squads, scaleMode, onScale, onDon
   );
 }
 
+// ── 데모 조직 — 가상 100명 회사(MORPH_DEMO_100)를 조직 단위 트리로: 대표 → 본부(직군) → 팀 → 사람 ──
+const DEMO_DIVS = { dev: ["개발본부", "본부"], design: ["디자인실", "실"], pm: ["프로덕트실", "실"], biz: ["비즈니스본부", "본부"], ops: ["경영지원실", "실"] };
+const DEMO_ORG = (() => {
+  const D = MORPH_DEMO_100, famColor = k => (MORPH_FAMILIES.find(f => f.key === k) || {}).color;
+  const units = [];
+  Object.entries(DEMO_DIVS).forEach(([fam, [name, label]]) => { if (D.teams.some(t => t.family === fam)) units.push({ id: `d-${fam}`, parentId: null, name, labelName: label, headId: null, teams: [] }); });
+  D.teams.forEach(t => { const head = D.persons.find(p => p.teamId === t.id && p.head);
+    units.push({ id: `u-${t.id}`, parentId: `d-${t.family}`, name: t.name, labelName: "팀", headId: head ? head.id : null, teams: [t.name] }); });
+  const children = D.persons.map(p => ({ id: p.id, name: p.name, title: p.title, team: D.teams.find(t => t.id === p.teamId).name,
+    avatar: p.name.slice(1, 3), color: famColor(p.family), status: "active" }));
+  const root = { id: "ceo", isCeo: true, name: "한지민", title: "CEO", avatar: "지민", status: "active", children };
+  return deriveOrgFromUnits(root, units);
+})();
+
+// 사람 카드 — §9-G 사람 카드 구성(아바타 · 이름 · 직함 · 조직장 배지)을 데모용으로 작게
+function DemoPerson({ m }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, width: 200, boxSizing: "border-box", background: P.color.card, borderRadius: 12,
+      padding: "10px 12px", boxShadow: ORG_CARD_SHADOW }}>
+      <OrgAvatar node={m} size={32} />
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 14, lineHeight: "20px", fontWeight: 600, color: P.color.strong, whiteSpace: "nowrap" }}>{m.name}</span>
+          {m.isHead && <OrgBadge bg={P.color.infoText} title="이 조직의 조직장">조직장</OrgBadge>}
+        </div>
+        <div style={{ fontSize: 12, lineHeight: "18px", color: P.color.muted, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{m.title}</div>
+      </div>
+    </div>
+  );
+}
+
+// 평면 트리 조직도 — 본부 · 팀까지 펼치고 팀 안(사람)은 접어 둔다. 팀 카드 아래 숫자 배지를 누르면 펼친다 · 끌어서 옮기기 · 줌
+function DemoTree() {
+  const [collapsed, setCollapsed] = useState(() => new Set(DEMO_ORG.UNITS.filter(u => u.parentId).map(u => u.id)));
+  const [zoom, setZoom] = useState(0.8);
+  const box = useRef(null), drag = useRef(null);
+  const toggle = id => setCollapsed(s => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  useEffect(() => { const el = box.current; if (el) el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2; }, []);
+  const down = e => { if (e.target.closest("[data-card] [title]")) return; const el = box.current; drag.current = { x: e.clientX, y: e.clientY, sl: el.scrollLeft, st: el.scrollTop }; };
+  const move = e => { const d = drag.current, el = box.current; if (!d) return; el.scrollLeft = d.sl - (e.clientX - d.x); el.scrollTop = d.st - (e.clientY - d.y); };
+  const up = () => { drag.current = null; };
+  const btn = { width: 36, height: 36, borderRadius: P.radius.md, border: "none", background: P.color.card, color: P.color.sub, cursor: "pointer", fontSize: 15, fontFamily: T.font, boxShadow: "rgba(10,13,18,.08) 0 4px 6px -1px" };
+  return (
+    <div data-demo-tree style={{ position: "relative", background: P.color.card, borderRadius: 16, overflow: "hidden" }}>
+      <div style={{ position: "absolute", top: 17, right: 20, display: "flex", flexDirection: "column", gap: 8, zIndex: 2 }}>
+        <button style={btn} title="확대" onClick={() => setZoom(z => Math.min(z + 0.1, 1.5))}>+</button>
+        <button style={btn} title="축소" onClick={() => setZoom(z => Math.max(z - 0.1, 0.4))}>−</button>
+        <button style={btn} title="모든 팀 펼치기" onClick={() => setCollapsed(new Set())}>⊞</button>
+        <button style={btn} title="팀 안 접기" onClick={() => setCollapsed(new Set(DEMO_ORG.UNITS.filter(u => u.parentId).map(u => u.id)))}>⊟</button>
+      </div>
+      <div ref={box} onMouseDown={down} onMouseMove={move} onMouseUp={up} onMouseLeave={up}
+        style={{ overflow: "auto", height: 720, cursor: "grab", padding: "40px 0" }}>
+        <div style={{ zoom, width: "max-content", minWidth: `${100 / zoom}%`, display: "flex", justifyContent: "center", padding: "0 80px", boxSizing: "border-box" }}>
+          <OrgUnitTreeView derived={DEMO_ORG} renderPerson={m => <DemoPerson m={m} />} onOpenCard={() => {}} collapsed={collapsed} onToggle={toggle} company="데모 컴퍼니" />
+        </div>
+      </div>
+      <div style={{ padding: "12px 24px", fontSize: 12, lineHeight: "18px", color: P.color.muted }}>
+        팀 카드 아래 숫자를 누르면 그 팀 사람이 펼쳐집니다 · 끌어서 옮기기 · 맨 위 «스쿼드» 탭을 누르면 같은 사람들이 스쿼드로 다시 모입니다
+      </div>
+    </div>
+  );
+}
+
 function Demo() {
   const [view, setView] = useState("org");
+  const [back, setBack] = useState(0);    // 스쿼드 → 조직도 덮개(역재생) — 끝나면 트리
   const [n, setN] = useState(0);
-  const go = v => { if (v === view) return; setView(v); setN(x => x + 1); };
+  const go = v => { if (v === view) return; setView(v); setN(x => x + 1); setBack(v === "org" ? Date.now() : 0); };
   return (
     <div style={{ minHeight: "100vh", background: P.color.bg, fontFamily: T.font, padding: "32px 40px 40px" }}>
       <div style={{ maxWidth: 1240, margin: "0 auto" }}>
@@ -412,11 +709,13 @@ function Demo() {
           ))}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0 16px", fontSize: 14, lineHeight: "20px" }}>
-          <span style={{ fontWeight: 700, color: P.color.sub }}>PIVIT 스쿼드 «한눈에» 데모</span>
+          <span style={{ fontWeight: 700, color: P.color.sub }}>PIVIT 조직도 · 스쿼드 데모</span>
           <span style={{ color: P.color.disabled }}>·</span>
           <span style={{ color: P.color.muted, fontWeight: 600 }}>위 탭을 바꿔 보세요 — 기능 조직(팀)의 사람이 목적 조직(스쿼드)으로 다시 모입니다 · 가상 인물 100명 · 기획 시안이라 실제 서비스와 다를 수 있습니다</span>
         </div>
-        <SquadIsoStage key={n} to={view} animate={n > 0} squads={[]} scaleMode="100" onScale={() => {}} onOpenCard={() => {}} />
+        {view === "squad" && <SquadIsoStage key={`s${n}`} to="squad" animate squads={[]} scaleMode="100" onScale={() => {}} onOpenCard={() => {}} />}
+        {view === "org" && back > 0 && <SquadIsoStage key={`b${back}`} to="org" animate overlay squads={[]} scaleMode="100" onScale={() => {}} onDone={() => setBack(0)} onOpenCard={() => {}} />}
+        {view === "org" && !back && <DemoTree />}
       </div>
     </div>
   );
