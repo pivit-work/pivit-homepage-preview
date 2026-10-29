@@ -663,18 +663,34 @@ function DemoPerson({ m }) {
 }
 
 // 평면 트리 조직도 — 본부 · 팀까지 펼치고 팀 안(사람)은 접어 둔다. 팀 카드 아래 숫자 배지를 누르면 펼친다 · 끌어서 옮기기 · 줌
-function DemoTree() {
+// 평면 → 2.5D — 트리 카드를 등각 바닥과 같은 각도로 눕힌다(Z 45° 돌린 뒤 X 54.7° 눕힘 = 등각 투영 · 원근 없음)
+const DEMO_TILT = "rotateX(54.7deg) rotateZ(45deg) scale(0.62)";
+function DemoTree({ tilt = false, overlay = false, enterTilted = false }) {
+  // 2.5D → 평면 — a: 평면·투명으로 먼저 그려 연결선을 잰다 → b: 전환 없이 눕힌다 → c: 일어서며 나타난다
+  //   (연결선은 카드 위치를 재서 그리므로, 누운 채 처음 그리면 기울어진 위치로 잰다)
+  const [rise, setRise] = useState(enterTilted ? "a" : null);
+  useEffect(() => { if (!enterTilted) return; let r2;
+    const r1 = requestAnimationFrame(() => { setRise("b"); r2 = requestAnimationFrame(() => requestAnimationFrame(() => setRise("c"))); });
+    return () => { cancelAnimationFrame(r1); cancelAnimationFrame(r2); }; }, []);
+  const lying = tilt || rise === "b";
+  const still = rise === "a" || rise === "b";   // 이 두 단계는 전환 없이 바로
   const [collapsed, setCollapsed] = useState(() => new Set(DEMO_ORG.UNITS.filter(u => u.parentId).map(u => u.id)));
   const [zoom, setZoom] = useState(0.8);
   const box = useRef(null), drag = useRef(null);
   const toggle = id => setCollapsed(s => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  // 트리 안쪽은 접기 상태가 바뀔 때만 다시 그린다 — 눕고 일어서는 동안 연결선을 기울어진 위치로 다시 재지 않게
+  const tree = useMemo(() => <OrgUnitTreeView derived={DEMO_ORG} renderPerson={m => <DemoPerson m={m} />} onOpenCard={() => {}} collapsed={collapsed} onToggle={toggle} company="데모 컴퍼니" />, [collapsed]);
   useEffect(() => { const el = box.current; if (el) el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2; }, []);
   const down = e => { if (e.target.closest("[data-card] [title]")) return; const el = box.current; drag.current = { x: e.clientX, y: e.clientY, sl: el.scrollLeft, st: el.scrollTop }; };
   const move = e => { const d = drag.current, el = box.current; if (!d) return; el.scrollLeft = d.sl - (e.clientX - d.x); el.scrollTop = d.st - (e.clientY - d.y); };
   const up = () => { drag.current = null; };
   const btn = { width: 36, height: 36, borderRadius: P.radius.md, border: "none", background: P.color.card, color: P.color.sub, cursor: "pointer", fontSize: 15, fontFamily: T.font, boxShadow: "rgba(10,13,18,.08) 0 4px 6px -1px" };
   return (
-    <div data-demo-tree style={{ position: "relative", background: P.color.card, borderRadius: 16, overflow: "hidden" }}>
+    <div data-demo-tree data-demo-tilt={lying ? "1" : "0"} style={{ position: overlay ? "absolute" : "relative", top: 0, left: 0, right: 0, zIndex: overlay ? 3 : "auto",
+      background: P.color.card, borderRadius: 16, overflow: "hidden", pointerEvents: overlay || lying ? "none" : "auto",
+      transform: lying ? DEMO_TILT : "none", transformOrigin: "50% 45%", opacity: overlay || still ? 0 : 1,
+      boxShadow: lying ? "rgba(10,13,18,.18) 0 30px 60px -20px" : "none",
+      transition: still ? "none" : "transform 750ms cubic-bezier(.45,0,.2,1), opacity 450ms ease, box-shadow 750ms" }}>
       <div style={{ position: "absolute", top: 17, right: 20, display: "flex", flexDirection: "column", gap: 8, zIndex: 2 }}>
         <button style={btn} title="확대" onClick={() => setZoom(z => Math.min(z + 0.1, 1.5))}>+</button>
         <button style={btn} title="축소" onClick={() => setZoom(z => Math.max(z - 0.1, 0.4))}>−</button>
@@ -684,7 +700,7 @@ function DemoTree() {
       <div ref={box} onMouseDown={down} onMouseMove={move} onMouseUp={up} onMouseLeave={up}
         style={{ overflow: "auto", height: 720, cursor: "grab", padding: "40px 0" }}>
         <div style={{ zoom, width: "max-content", minWidth: `${100 / zoom}%`, display: "flex", justifyContent: "center", padding: "0 80px", boxSizing: "border-box" }}>
-          <OrgUnitTreeView derived={DEMO_ORG} renderPerson={m => <DemoPerson m={m} />} onOpenCard={() => {}} collapsed={collapsed} onToggle={toggle} company="데모 컴퍼니" />
+          {tree}
         </div>
       </div>
       <div style={{ padding: "12px 24px", fontSize: 12, lineHeight: "18px", color: P.color.muted }}>
@@ -694,11 +710,28 @@ function DemoTree() {
   );
 }
 
+// 스쿼드 무대가 서서히 드러나게 — 마운트 직후 0 → 1
+function FadeIn({ ms = 450, children }) {
+  const [on, setOn] = useState(false);
+  useEffect(() => { const r = requestAnimationFrame(() => requestAnimationFrame(() => setOn(true))); return () => cancelAnimationFrame(r); }, []);
+  return <div style={{ opacity: on ? 1 : 0, transition: `opacity ${ms}ms ease` }}>{children}</div>;
+}
+
+// 장면 — tree(평면) · tilt(트리가 눕는다) · cross(누운 트리 위로 무대가 겹쳐 떠오른다) · squad(무대만) · back(역재생 덮개) · rise(누운 트리가 일어선다)
 function Demo() {
   const [view, setView] = useState("org");
-  const [back, setBack] = useState(0);    // 스쿼드 → 조직도 덮개(역재생) — 끝나면 트리
+  const [phase, setPhase] = useState("tree");
   const [n, setN] = useState(0);
-  const go = v => { if (v === view) return; setView(v); setN(x => x + 1); setBack(v === "org" ? Date.now() : 0); };
+  const timers = useRef([]);
+  const go = v => {
+    if (v === view) return;
+    timers.current.forEach(clearTimeout); timers.current = [];
+    setView(v); setN(x => x + 1);
+    if (v === "squad") { setPhase("tilt"); timers.current.push(setTimeout(() => setPhase("cross"), 700), setTimeout(() => setPhase("squad"), 1200)); }
+    else setPhase("back");
+  };
+  const showTree = ["tree", "tilt", "cross", "rise"].includes(phase);
+  const showStage = ["cross", "squad"].includes(phase);
   return (
     <div style={{ minHeight: "100vh", background: P.color.bg, fontFamily: T.font, padding: "32px 40px 40px" }}>
       <div style={{ maxWidth: 1240, margin: "0 auto" }}>
@@ -713,9 +746,11 @@ function Demo() {
           <span style={{ color: P.color.disabled }}>·</span>
           <span style={{ color: P.color.muted, fontWeight: 600 }}>위 탭을 바꿔 보세요 — 기능 조직(팀)의 사람이 목적 조직(스쿼드)으로 다시 모입니다 · 가상 인물 100명 · 기획 시안이라 실제 서비스와 다를 수 있습니다</span>
         </div>
-        {view === "squad" && <SquadIsoStage key={`s${n}`} to="squad" animate squads={[]} scaleMode="100" onScale={() => {}} onOpenCard={() => {}} />}
-        {view === "org" && back > 0 && <SquadIsoStage key={`b${back}`} to="org" animate overlay squads={[]} scaleMode="100" onScale={() => {}} onDone={() => setBack(0)} onOpenCard={() => {}} />}
-        {view === "org" && !back && <DemoTree />}
+        <div style={{ position: "relative" }}>
+          {showStage && <FadeIn key={`s${n}`}><SquadIsoStage to="squad" animate squads={[]} scaleMode="100" onScale={() => {}} onOpenCard={() => {}} /></FadeIn>}
+          {phase === "back" && <SquadIsoStage key={`b${n}`} to="org" animate overlay squads={[]} scaleMode="100" onScale={() => {}} onDone={() => setPhase("rise")} onOpenCard={() => {}} />}
+          {showTree && <DemoTree key={phase === "rise" ? `r${n}` : "tree"} tilt={phase === "tilt" || phase === "cross"} overlay={phase === "cross"} enterTilted={phase === "rise"} />}
+        </div>
       </div>
     </div>
   );
