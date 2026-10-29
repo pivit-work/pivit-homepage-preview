@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>[데모] PIVIT 스쿼드 한눈에</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="https://pivit-work.github.io/design-system-docs/tokens.css">
+<link rel="stylesheet" href="https://pivit-work.github.io/design-system-docs/tokens-dark.css">
+<style>html,body{margin:0} body{background:#f3f4f6}</style>
+<script>
+  var v = function(name, fallback){ return 'var(--colors-' + name + ',' + fallback + ')'; };
+  window.PIVIT = {
+    font: "'Pretendard','Noto Sans KR',system-ui,sans-serif",
+    mono: "'DM Mono',ui-monospace,Menlo,monospace",
+    color: {
+      strong:      v('foreground-fgPrimary','#2c3744'),  // 헤딩·강조 — **페이지 제목 포함** (§7 매핑 · §9 2026-08-12 확정)
+      text:        v('text-textPrimary',   '#596069'),   // 본문 — near-black 아님. 제목에는 쓰지 않는다(계층 붕괴)
+      sub:         v('text-textSecondary', '#687079'),
+      muted:       v('text-textTertiary',  '#b1b6be'),   // placeholder·disabled
+      disabled:    v('text-textQuaternary','#d2d6db'),
+      onBrand:     v('base-white',         '#ffffff'),
+
+      bg:          v('background-bgPrimary',    '#f3f4f6'),  // 페이지 배경
+      bgSection:   v('background-bgSecondary',  '#f9fafb'),
+      card:        v('background-bgQuaternary', '#ffffff'),
+      hover:       'rgba(0,0,0,.03)',                        // ghost 버튼·행 hover
+
+      brand:       v('background-bgBrandSolid',    '#2dbd82'),
+      brandHover:  v('background-bgBrandSolidHover','#21a67a'),
+      brandSoft:   v('background-bgBrandSecondary','#e1fef2'),
+      brandFaint:  v('background-bgBrandPrimary',  '#f1fffa'),
+      brandText:   v('text-textBrandTertiary',     '#21a67a'),
+      brandDeep:   v('text-textBrandSecondary',    '#10774d'),
+
+      border:      v('border-borderPrimary',   '#d2d6db'),
+      borderLight: v('border-borderSecondary', '#e6e8ea'),   // divider
+      borderBrand: v('border-borderBrand',     '#2dbd82'),
+      brandBorder: v('brand-200',              '#b3fade'),   // 액센트 틴트 보더 (구 #C7D2FE 대응)
+
+      // 상태 — AI 초안 UX 규칙: 미확인=warning(노랑), 확인=success(초록)
+      success:       v('background-bgSuccessSolid',  '#079455'),
+      successBg:     v('background-bgSuccessPrimary','#ecfdf3'),
+      successBorder: v('success-200',                '#abefc6'),
+      successText:   v('text-textSuccessPrimary',    '#079455'),
+      warning:       v('background-bgWarningSolid',  '#dc6803'),
+      star:          v('warning-500',                '#f79009'),   // 리드 ★ 마크 — 앱 실측 §9-J
+      warningBg:     v('background-bgWarningPrimary','#fffaeb'),
+      warningBorder: v('warning-200',                '#fedf89'),
+      warningText:   v('text-textWarningPrimary',    '#dc6803'),
+      error:         v('background-bgErrorSolid',    '#f04438'),
+      errorBg:       v('background-bgErrorPrimary',  '#fef3f2'),
+      errorBorder:   v('error-200',                  '#fecdca'),
+      errorText:     v('text-textErrorPrimary',      '#d92d20'),
+
+      // 정보(파랑)·역할(보라) — app.dev.pivit.work/eval 실측에서 쓰이는 DS 팔레트(§9-D).
+      //   상태 '진행 중' 배지·열기 링크 = blue, 위원장 역할 배지 = purple.
+      infoBg:        v('blue-50',                    '#eff8ff'),
+      infoText:      v('blue-600',                   '#1570ef'),
+      infoBorder:    v('blue-200',                   '#b2ddff'),   // info 배지 보더 (역할 배지 등 범주 구분용)
+      roleBg:        v('purple-100',                 '#ebe9fe'),
+      roleText:      v('purple-700',                 '#5925dc')
+    },
+    // 아래 수치는 app.dev.pivit.work/timeline 실측값 (2026-08-12 기준)
+    radius: { sm: 4, md: 8, lg: 10, xl: 16, xxl: 24, pill: 9999 },
+    space:  { xs: 4, sm: 6, md: 8, lg: 12, xl: 16, xxl: 20, xxxl: 28 },
+    shadow: { md: '0 4px 12px rgba(10,13,18,.18)' },
+    layout: { sidebar: 240, headerH: 68, pagePad: '72px 40px 20px 0', cardRadius: 16 },
+    type: {
+      title:   { fontSize: 30, lineHeight: '38px', fontWeight: 700 },   // 페이지 제목
+      body:    { fontSize: 14, lineHeight: '20px', fontWeight: 500 },
+      label:   { fontSize: 12, lineHeight: '18px', fontWeight: 600, letterSpacing: '-0.12px' },
+      caption: { fontSize: 12, lineHeight: '18px', fontWeight: 400 },
+      button:  { fontSize: 14, lineHeight: '20px', fontWeight: 600 }
+    }
+  };
+</script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.26.4/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo, useRef } = React;
+const P = window.PIVIT;
+const T = { font: "'Pretendard','Noto Sans KR',sans-serif" };
+const SQUADS = [{"color": "#4F6AF5"}, {"color": "#8B5CF6"}, {"color": "#F59E0B"}, {"color": "#22C55E"}];
+const ISO = { cos: 0.866, sin: 0.5, pad: 12, gapX: 48, gapY: 120, rowW: 1000, slab: 10, lift: 56, cell: 88, cs: 20, ch: 16, cardW: 96, cardH: 34 };
+const isoP = (x, y, z = 0) => [(x - y) * ISO.cos, (x + y) * ISO.sin - z];
+const isoPts = arr => arr.map(([x, y, z]) => isoP(x, y, z).map(v => v.toFixed(1)).join(",")).join(" ");
+const isoMix = (c, pct, base) => `color-mix(in srgb, ${c} ${pct}%, ${base || P.color.card})`;
+const MORPH_FAMILIES = [
+  { key: "dev", label: "개발", color: P.color.infoText },
+  { key: "design", label: "디자인", color: P.color.roleText },
+  { key: "pm", label: "기획", color: P.color.brand },
+  { key: "biz", label: "마케팅·영업", color: P.color.warning },
+  { key: "ops", label: "경영지원", color: P.color.sub },   // [v3.34] 원색 빨강(errorText) → 중립 회색 — 톤앤매너(오류로 읽히지 않게)
+];
+const MORPH_DEMO_100 = (() => {
+  const TEAMS = [["dev", "프론트엔드", 10], ["dev", "백엔드", 12], ["dev", "모바일", 8], ["dev", "데이터", 7], ["dev", "QA", 5],
+    ["design", "프로덕트 디자인", 8], ["design", "브랜드 디자인", 4], ["pm", "프로덕트", 9],
+    ["biz", "마케팅", 9], ["biz", "영업", 8], ["biz", "CS", 7], ["ops", "인사", 5], ["ops", "재무", 4], ["ops", "경영지원", 4]];
+  const SUR = "김이박최정강조윤장임한오서신권황안송류홍".split("");
+  const GIV = ["민준", "서연", "지호", "하은", "도윤", "수아", "예준", "지우", "시우", "서윤", "주원", "하린", "지훈", "유나", "건우", "채원", "현우", "다은", "우진", "소윤"];
+  const teams = TEAMS.map(([fam, name], i) => ({ id: `t${i}`, name, family: fam }));
+  const TITLE = ["FE 개발자", "BE 개발자", "앱 개발자", "데이터 엔지니어", "QA 엔지니어", "UX 디자이너", "BX 디자이너", "PM",
+    "마케터", "영업 매니저", "CS 매니저", "HR 매니저", "재무 담당", "총무 담당"];
+  const persons = []; let n = 0;
+  TEAMS.forEach(([fam, , size], ti) => { for (let k = 0; k < size; k++, n++) {
+    const giv = GIV[(n * 7 + 3) % GIV.length];
+    persons.push({ id: `p${n}`, name: SUR[n % SUR.length] + giv, avatar: giv, teamId: `t${ti}`, family: fam, title: TITLE[ti], head: k === 0 });   // 팀 첫 사람 = 팀장
+  } });
+  const pool = {}; MORPH_FAMILIES.forEach(f => { pool[f.key] = persons.filter(p => p.family === f.key); });
+  const cursor = {}; let picks = 0;
+  const take = fam => { const list = pool[fam]; cursor[fam] = (cursor[fam] || 0); picks++;
+    if (picks % 7 === 0) return list[(cursor[fam] + 3) % list.length];          // 7번에 한 번은 이미 뽑힌 사람 — 여러 스쿼드 겸임
+    return list[(cursor[fam]++) % list.length]; };
+  const COLORS = SQUADS.map(sq => sq.color);
+  const SPEC = [["결제 리뉴얼", { pm: 1, dev: 7, design: 2, biz: 1 }], ["모바일 앱 2.0", { pm: 1, dev: 8, design: 2 }], ["데이터 플랫폼", { pm: 1, dev: 6 }],
+    ["AI 추천", { pm: 1, dev: 5, design: 1, biz: 1 }], ["신규 고객 온보딩", { pm: 1, biz: 5, design: 1, dev: 2 }], ["글로벌 진출", { pm: 1, biz: 5, ops: 2, dev: 1 }],
+    ["브랜드 캠페인", { design: 3, biz: 4 }], ["채용 브랜딩", { ops: 3, design: 1, biz: 1 }]];
+  const squads = SPEC.map(([name, mix], i) => {
+    const ids = []; Object.entries(mix).forEach(([fam, cnt]) => { for (let k = 0; k < cnt; k++) { const p = take(fam); if (!ids.includes(p.id)) ids.push(p.id); } });
+    return { id: `s${i}`, name, color: COLORS[i % COLORS.length], members: ids.map((pid, k) => ({ pid, lead: k === 0 })) };
+  });
+  return { teams, persons, squads };
+})();
+function morphData(scaleMode, squads) {
+  if (scaleMode === "100") return MORPH_DEMO_100;
+  const shown = squads.filter(sq => GRAPH_DEFAULT_STATUS.includes(sq.status));
+  const zoneOf = m => (m.isCeo ? "ceo" : (LIST_TEAM_TO_UNIT[m.team] || "none"));
+  const zoneRank = z => (z === "ceo" ? -1 : z === "none" ? 9999 : LIST_UNIT_ORDER.findIndex(x => x.unit.id === z));
+  const people = ALL_ORG_MEMBERS.filter(m => m && m.name);
+  const extra = [...new Set(shown.flatMap(sq => sq.members.map(x => x.name)))].filter(nm => !people.some(p => p.name === nm)).map(nm => ({ name: nm, team: null }));
+  const all = [...people, ...extra];
+  const zones = [...new Set(all.map(zoneOf))].sort((a, b) => zoneRank(a) - zoneRank(b));
+  const teams = zones.map((z, i) => ({ id: z, name: z === "ceo" ? "대표" : z === "none" ? "미배정" : unitById(z).name, family: MORPH_FAMILIES[i % MORPH_FAMILIES.length].key }));
+  const persons = all.map(m => { const om = findMember(m.name);
+    return { id: m.name, name: callNameByName(m.name), teamId: zoneOf(m), om, title: (om && om.title) || "", head: !!(om && (om.isHead || om.isCeo)) }; });
+  persons.forEach(p => { p.family = teams.find(t => t.id === p.teamId).family; });
+  return { teams, persons, squads: shown.map(sq => ({ id: sq.id, name: sq.name, color: sq.color, members: sq.members.map(x => ({ pid: x.name, lead: x.role === "lead" })) })) };
+}
+function isoLayout(counts, cell) {
+  const out = []; let x = 0, y = 0, rowD = 0, W = 0;
+  counts.forEach(n => {
+    const cols = Math.max(2, Math.ceil(Math.sqrt(n))), rows = Math.max(1, Math.ceil(n / cols));
+    const w = cols * cell + ISO.pad * 2, d = rows * cell + ISO.pad * 2;
+    if (x > 0 && x + w > ISO.rowW) { x = 0; y += rowD + ISO.gapY; rowD = 0; }
+    out.push({ x, y, w, d, cols });
+    W = Math.max(W, x + w); x += w + ISO.gapX; rowD = Math.max(rowD, d);
+  });
+  return { slabs: out, w: W, h: y + rowD };
+}
+const isoFit = (s, maxPx, fs) => { let w = 0, out = "";
+  for (const ch of String(s || "")) { const cw = /[ㄱ-힣]/.test(ch) ? fs : fs * 0.58;
+    if (w + cw > maxPx) return out + "…"; w += cw; out += ch; }
+  return out; };
+function SquadIsoStage({ to, animate, overlay, squads, scaleMode, onScale, onDone, onOpenCard }) {
+  const reduce = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const play = !!animate && !reduce;
+  const from = to === "squad" ? "org" : "squad";
+  const [phase, setPhase] = useState(play ? "play" : "done");
+  const [up, setUp] = useState(play ? from : to);     // 지금 솟아 있는 판 — org(팀) | squad(스쿼드) | none(둘 다 가라앉음)
+  const [leaving, setLeaving] = useState(false);
+  const [hov, setHov] = useState(null);
+  const [zoom, setZoom] = useState(1);
+  const nodes = useRef({}), shadows = useRef({}), run = useRef({ raf: 0, T: [] });
+  const scroller = useRef(null), drag = useRef(null);
+  const data = useMemo(() => morphData(scaleMode, squads), [scaleMode, squads]);
+  const famOf = k => MORPH_FAMILIES.find(f => f.key === k) || MORPH_FAMILIES[0];
+  const personOf = pid => data.persons.find(x => x.id === pid);
+  const teamOf = id => data.teams.find(x => x.id === id);
+  const cell = ISO.cell, cs = ISO.cs, chh = ISO.ch;   // 칸 · 블록 한 변 · 블록 높이
+  const teamMembers = data.teams.map(t => data.persons.filter(p => p.teamId === t.id)
+    .sort((a, b) => (b.head - a.head)).map(p => ({ pid: p.id, lead: false })));
+  const inSquad = new Set(data.squads.flatMap(sq => sq.members.map(m => m.pid)));
+  const none = data.persons.filter(p => !inSquad.has(p.id));
+  const sqLists = [...data.squads.map(sq => [...sq.members].sort((a, b) => (b.lead - a.lead))), ...(none.length ? [none.map(p => ({ pid: p.id, lead: false }))] : [])];
+  const TL = isoLayout(teamMembers.map(l => l.length), cell), SL = isoLayout(sqLists.map(l => l.length), cell);
+  const GW = Math.max(TL.w, SL.w), GH = Math.max(TL.h, SL.h);
+  [TL, SL].forEach(L => { const ox = (GW - L.w) / 2, oy = (GH - L.h) / 2; L.slabs.forEach(s => { s.x += ox; s.y += oy; }); });
+  const slot = (s, k) => ({ x: s.x + ISO.pad + ((k % s.cols) + 0.5) * cell, y: s.y + ISO.pad + (Math.floor(k / s.cols) + 0.5) * cell });
+  const teamAt = {}; teamMembers.forEach((l, ti) => l.forEach((m, k) => { teamAt[m.pid] = slot(TL.slabs[ti], k); }));
+  const seen = new Set();
+  const tokens = [];
+  sqLists.forEach((l, si) => l.forEach((m, k) => {
+    const isNone = si >= data.squads.length, p = personOf(m.pid);
+    const sqAt = slot(SL.slabs[si], k), tAt = teamAt[m.pid];
+    tokens.push({ key: `${m.pid}::${isNone ? "-" : data.squads[si].id}`, pid: m.pid, p, lead: m.lead, none: isNone,
+      A: from === "org" ? tAt : sqAt, B: to === "org" ? tAt : sqAt, dup: seen.has(m.pid) });
+    seen.add(m.pid);
+  }));
+  const drawn = [...tokens].sort((a, b) => (a.B.x + a.B.y) - (b.B.x + b.B.y));
+  const onSquadFloor = phase === "done" ? to === "squad" : from === "squad";
+  const clamp01 = v => Math.max(0, Math.min(1, v));
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  const easeInOut = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const finish = () => {
+    const r = run.current; cancelAnimationFrame(r.raf); r.T.forEach(clearTimeout); r.T = [];
+    setUp(to); setPhase("done");
+    if (overlay) { r.T.push(setTimeout(() => setLeaving(true), 450), setTimeout(() => onDone && onDone(), 850)); }
+    else if (onDone) onDone();
+  };
+  useEffect(() => {
+    if (!play) { if (overlay && onDone) onDone(); return; }
+    const r = run.current, n = Math.max(1, drawn.length);
+    const liftOrder = [...drawn].sort((a, b) => (a.A.x + a.A.y) - (b.A.x + b.A.y));
+    const items = drawn.map((tk, i) => ({ tk, s1: liftOrder.indexOf(tk) * (300 / n), s2: 980 + i * (520 / n),
+      arc: 24 + Math.hypot(tk.B.x - tk.A.x, tk.B.y - tk.A.y) * 0.1 }));
+    let t0 = 0;
+    const step = now => {
+      if (!t0) t0 = now;
+      const el = now - t0; let left = false;
+      items.forEach(({ tk, s1, s2, arc }) => {
+        const { A, B } = tk; let x = A.x, y = A.y, z;
+        if (el < s2) { z = ISO.lift * easeOut(clamp01((el - s1) / 420)); left = true; }
+        else {
+          const e = easeInOut(clamp01((el - s2) / 900)); if (e < 1) left = true;
+          x = A.x + (B.x - A.x) * e; y = A.y + (B.y - A.y) * e; z = ISO.lift * (1 - e) + arc * Math.sin(Math.PI * e);
+        }
+        const [sx, sy] = isoP(x, y, z), nd = nodes.current[tk.key];
+        if (nd) nd.setAttribute("transform", `translate(${sx.toFixed(1)} ${sy.toFixed(1)})`);
+        const sh = shadows.current[tk.key];
+        if (sh) { const [gx, gy] = isoP(x, y, 0);
+          sh.setAttribute("transform", `translate(${gx.toFixed(1)} ${gy.toFixed(1)}) scale(${(1 - Math.min(0.45, z / 220)).toFixed(3)})`);
+          sh.setAttribute("opacity", (0.9 * Math.min(1, z / 16)).toFixed(2)); }
+      });
+      if (left) r.raf = requestAnimationFrame(step); else finish();
+    };
+    r.T.push(setTimeout(() => setUp("none"), 470), setTimeout(() => setUp(to), 800));
+    r.raf = requestAnimationFrame(step);
+    return () => { cancelAnimationFrame(r.raf); r.T.forEach(clearTimeout); };
+  }, []);
+  const t = ISO.slab;
+  const slab = (s, key, show, accent, stripes, dashed) => {
+    const { x, y, w, d } = s;
+    const tot = stripes ? stripes.reduce((a, b) => a + b.n, 0) : 0; let acc = 0;
+    return (
+      <g key={key} data-iso-slab={key} style={{ pointerEvents: "none", transform: `translateY(${show ? 0 : 26}px)`, opacity: show ? (dashed ? 0.75 : 1) : 0,
+        transition: "transform 420ms cubic-bezier(.2,.8,.2,1), opacity 380ms" }}>
+        <polygon points={isoPts([[x, y + d, 0], [x + w, y + d, 0], [x + w, y + d, -t], [x, y + d, -t]])} style={{ fill: P.color.borderLight }} />
+        {(stripes || [{ f: { key: "one", color: accent || P.color.border }, n: 1 }]).map(st => { const x0 = x + (w * acc) / (tot || 1); acc += st.n; const x1 = x + (w * acc) / (tot || 1); return (
+          <polygon key={st.f.key} points={isoPts([[x0, y + d, 0], [x1, y + d, 0], [x1, y + d, -4], [x0, y + d, -4]])} style={{ fill: isoMix(st.f.color, 70) }} />
+        ); })}
+        <polygon points={isoPts([[x + w, y + d, 0], [x + w, y, 0], [x + w, y, -t], [x + w, y + d, -t]])} style={{ fill: P.color.border }} />
+        <polygon points={isoPts([[x, y, 0], [x + w, y, 0], [x + w, y + d, 0], [x, y + d, 0]])}
+          style={{ fill: accent && !dashed ? isoMix(accent, 6) : P.color.card, stroke: P.color.borderLight, strokeWidth: 1, strokeDasharray: dashed ? "5 4" : "none" }} />
+      </g>
+    );
+  };
+  const label = (s, key, show, name, headRole, headName, sub, dot) => {
+    const [lx, ly] = isoP(s.x + s.w / 2, s.y + s.d, -t);
+    const halo = { paintOrder: "stroke", stroke: P.color.bg, strokeWidth: 4, strokeLinejoin: "round", fontFamily: T.font };
+    return (
+      <g key={`lb-${key}`} transform={`matrix(${ISO.cos} ${ISO.sin} 0 1 ${lx.toFixed(1)} ${ly.toFixed(1)})`}
+        style={{ opacity: show ? 1 : 0, transition: "opacity 380ms", pointerEvents: "none" }}>
+        <text x={0} y={18} textAnchor="middle" style={{ ...halo, fontSize: 14, fontWeight: 700, fill: P.color.strong }}>
+          {dot && <tspan style={{ fill: dot }}>● </tspan>}{name}
+        </text>
+        <text x={0} y={35} textAnchor="middle" style={{ ...halo, fontSize: 12, fontWeight: 600, fill: P.color.sub }}>
+          {headRole && <tspan style={{ fill: P.color.star }}>★ </tspan>}
+          {headRole ? `${headRole} ${headName || "미지정"}` : ""}{headRole ? " · " : ""}{sub}
+        </text>
+      </g>
+    );
+  };
+  const h2 = cs / 2;
+  const cubeFaces = h => ({
+    top: isoPts([[-h2, -h2, h], [h2, -h2, h], [h2, h2, h], [-h2, h2, h]]),
+    front: isoPts([[-h2, h2, h], [h2, h2, h], [h2, h2, 0], [-h2, h2, 0]]),
+    side: isoPts([[h2, h2, h], [h2, -h2, h], [h2, -h2, 0], [h2, h2, 0]]),
+  });
+  const faces = cubeFaces(chh), tall = cubeFaces(chh * 1.7);
+  const famCount = list => MORPH_FAMILIES.map(f => ({ f, n: list.filter(m => (personOf(m.pid) || {}).family === f.key).length })).filter(x => x.n > 0);
+  const CW = ISO.cardW, CH = ISO.cardH;
+  const g0 = -40, gx1 = GW + 40, gy1 = GH + 40, step4 = cell * 4;
+  const gridLines = [];
+  for (let v = g0 + step4; v < gx1; v += step4) gridLines.push([[v, g0, 0], [v, gy1, 0]]);
+  for (let v = g0 + step4; v < gy1; v += step4) gridLines.push([[g0, v, 0], [gx1, v, 0]]);
+  const vbX = isoP(g0, gy1)[0] - 24, vbW = isoP(gx1, g0)[0] + 24 - vbX;
+  const vbY = isoP(g0, g0)[1] - 80, vbH = isoP(gx1, gy1)[1] + 60 - vbY;
+  useEffect(() => { const el = scroller.current; if (el) el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2; }, [zoom, scaleMode]);
+  const onDown = e => { const el = scroller.current; if (!el) return; drag.current = { x: e.clientX, y: e.clientY, sl: el.scrollLeft, st: el.scrollTop, moved: false }; };
+  const onMove = e => { const d = drag.current, el = scroller.current; if (!d || !el) return;
+    const dx = e.clientX - d.x, dy = e.clientY - d.y; if (Math.abs(dx) + Math.abs(dy) > 4) d.moved = true;
+    el.scrollLeft = d.sl - dx; el.scrollTop = d.st - dy; };
+  const onUp = () => { setTimeout(() => { drag.current = null; }, 0); };
+  const fit = () => { const el = scroller.current; if (el) setZoom(Math.min(1, Math.max(0.4, (el.clientWidth - 8) / vbW))); };
+  const seg = (items, value) => (
+    <div style={{ display: "flex", gap: 2, padding: 4, borderRadius: 8, background: P.color.hover }}>
+      {items.map(v => { const active = v.key === value; return (
+        <button key={v.key} data-iso-btn={v.key} onClick={v.on} style={{ height: 28, padding: "4px 8px", borderRadius: 6, cursor: "pointer",
+          border: `1px solid ${active ? P.color.bgSection : "transparent"}`, background: active ? P.color.card : "transparent",
+          boxShadow: active ? "rgba(10,13,18,.08) 0 4px 6px -1px" : "none", color: active ? P.color.sub : P.color.muted,
+          fontSize: 14, lineHeight: "20px", fontWeight: 700, fontFamily: T.font }}>{v.label}</button>
+      ); })}
+    </div>
+  );
+  const hp = hov && personOf(hov);
+  const hpSquads = hp ? data.squads.filter(sq => sq.members.some(m => m.pid === hov)) : [];
+  const atSquad = phase === "done" ? to === "squad" : false;
+  return (
+    <div data-iso-stage={to} data-iso-phase={phase} style={{ background: P.color.card, borderRadius: 16, overflow: "hidden", opacity: leaving ? 0 : 1, transition: "opacity 400ms" }}>
+      <div style={{ padding: "16px 24px 12px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 14, lineHeight: "20px", fontWeight: 700, color: atSquad ? P.color.muted : P.color.strong, transition: "color 400ms" }}>팀(기능 조직) {data.teams.length}개 · {data.persons.length}명</span>
+          <span style={{ fontSize: 14, color: P.color.muted }}>{to === "squad" ? "→" : "←"}</span>
+          <span style={{ fontSize: 14, lineHeight: "20px", fontWeight: 700, color: atSquad || (phase === "play" && to === "squad") ? P.color.strong : P.color.muted, transition: "color 400ms" }}>스쿼드(목적 조직) {data.squads.length}개</span>
+        </div>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {phase === "play" && seg([{ key: "skip", label: "건너뛰기 ›", on: overlay ? onDone : finish }], null)}
+        </div>
+      </div>
+      <div style={{ position: "relative", margin: "0 24px", borderRadius: 14, background: P.color.bg, overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: 12, right: 12, display: "flex", flexDirection: "column", gap: 8, zIndex: 2 }}>
+          {[["+", () => setZoom(z => Math.min(z + 0.1, 1.5)), `확대 (현재 ${Math.round(zoom * 100)}%)`],
+            ["−", () => setZoom(z => Math.max(z - 0.1, 0.4)), `축소 (현재 ${Math.round(zoom * 100)}%)`],
+            ["⤢", fit, "한 화면에 맞추기"]].map(([lb, fn, tip]) => (
+            <button key={lb} data-iso-zoom={lb} onClick={fn} title={tip} style={{ width: 36, height: 36, borderRadius: P.radius.md, border: "none",
+              background: P.color.card, color: P.color.sub, cursor: "pointer", fontSize: 15, fontFamily: T.font, boxShadow: "rgba(10,13,18,.08) 0 4px 6px -1px" }}>{lb}</button>
+          ))}
+        </div>
+        <div ref={scroller} data-iso-scroll onMouseDown={onDown} onMouseMove={onMove} onMouseUp={onUp} onMouseLeave={onUp}
+          style={{ overflow: "auto", maxHeight: 760, cursor: "grab" }}>
+          <svg viewBox={`${vbX.toFixed(0)} ${vbY.toFixed(0)} ${vbW.toFixed(0)} ${vbH.toFixed(0)}`} width={Math.round(vbW * zoom)} height={Math.round(vbH * zoom)}
+            style={{ display: "block", margin: "0 auto", overflow: "visible", userSelect: "none" }}>
+            <polygon points={isoPts([[g0, gy1, 0], [gx1, gy1, 0], [gx1, gy1, -6], [g0, gy1, -6]])} style={{ fill: P.color.borderLight }} />
+            <polygon points={isoPts([[gx1, gy1, 0], [gx1, g0, 0], [gx1, g0, -6], [gx1, gy1, -6]])} style={{ fill: P.color.border }} />
+            <polygon points={isoPts([[g0, g0, 0], [gx1, g0, 0], [gx1, gy1, 0], [g0, gy1, 0]])} style={{ fill: P.color.bgSection }} />
+            {gridLines.map((ln, i) => <polyline key={`gl${i}`} points={isoPts(ln)} style={{ fill: "none", stroke: P.color.borderLight, strokeWidth: 1 }} />)}
+            {data.teams.map((tm, ti) => slab(TL.slabs[ti], `t-${tm.id}`, up === "org", famOf(tm.family).color, null))}
+            {data.squads.map((sq, si) => slab(SL.slabs[si], `s-${sq.id}`, up === "squad", sq.color, famCount(sq.members)))}
+            {none.length > 0 && slab(SL.slabs[data.squads.length], "s-none", up === "squad", null, null, true)}
+            {data.teams.map((tm, ti) => { const hd = teamMembers[ti].map(m => personOf(m.pid)).find(p => p && p.head);
+              return label(TL.slabs[ti], `t-${tm.id}`, up === "org", tm.name, "팀장", hd && hd.name, `${teamMembers[ti].length}명 · ${famOf(tm.family).label}`, isoMix(famOf(tm.family).color, 70)); })}
+            {data.squads.map((sq, si) => { const ld = personOf((sq.members.find(m => m.lead) || {}).pid);
+              return label(SL.slabs[si], `s-${sq.id}`, up === "squad", sq.name, "리드", ld && ld.name, `${sq.members.length}명 · ${famCount(sq.members).length}개 직군`, sq.color); })}
+            {none.length > 0 && label(SL.slabs[data.squads.length], "s-none", up === "squad", "스쿼드 없음", null, null, `${none.length}명`, null)}
+            {phase === "play" && drawn.map(tk => { const [gx, gy] = isoP(tk.A.x, tk.A.y, 0); return (
+              <ellipse key={`sh-${tk.key}`} ref={el => { shadows.current[tk.key] = el; }} cx={0} cy={0} rx={cs * 0.8} ry={cs * 0.42} opacity={0}
+                transform={`translate(${gx.toFixed(1)} ${gy.toFixed(1)})`} style={{ fill: "rgba(10,13,18,.14)" }} />
+            ); })}
+            {drawn.map(tk => {
+              if (phase === "done" && to === "org" && tk.dup) return null;
+              const at = phase === "done" ? tk.B : tk.A;
+              const [sx, sy] = isoP(at.x, at.y, 0);
+              const c = famOf(tk.p.family).color;
+              const isHead = onSquadFloor ? tk.lead : tk.p.head;
+              const f = isHead ? tall : faces, bh = isHead ? chh * 1.7 : chh;
+              const dim = hov ? (tk.pid === hov ? 1 : 0.2) : (tk.none && onSquadFloor ? 0.5 : 1);
+              const team = teamOf(tk.p.teamId);
+              const role = isHead ? (onSquadFloor ? "리드" : "팀장") : "";
+              const line2 = onSquadFloor ? (team ? team.name : "") : (tk.p.title || (team ? team.name : ""));
+              const cy = -bh - h2 - 9 - CH;   // 이름표 윗변 — 블록 꼭대기 위 9px(꼭지 자리)
+              return (
+                <g key={tk.key} data-iso-cube={tk.key} ref={el => { nodes.current[tk.key] = el; }} transform={`translate(${sx.toFixed(1)} ${sy.toFixed(1)})`}
+                  opacity={dim} onMouseEnter={() => phase === "done" && setHov(tk.pid)} onMouseLeave={() => setHov(null)}
+                  onClick={() => { if (drag.current && drag.current.moved) return; tk.p.om && onOpenCard(tk.p.om); }}
+                  style={{ cursor: tk.p.om ? "pointer" : "inherit", transition: "opacity 200ms" }}>
+                  <title>{`${tk.p.name}${role ? ` · ${role}` : ""} · ${tk.p.title ? `${tk.p.title} · ` : ""}${team ? team.name : ""}${tk.none ? " · 스쿼드 없음" : ""}`}</title>
+                  <polygon points={f.front} style={{ fill: isoMix(c, 55) }} />
+                  <polygon points={f.side} style={{ fill: isoMix(c, 78) }} />
+                  <polygon points={f.top} style={{ fill: isoMix(c, 24) }} />
+                  <g data-iso-tag>
+                    <path d={`M -6 ${cy + CH - 1} L 0 ${cy + CH + 7} L 6 ${cy + CH - 1} Z`} style={{ fill: P.color.card, stroke: hov === tk.pid ? P.color.borderBrand : P.color.borderLight, strokeWidth: 1 }} />
+                    <rect x={-CW / 2} y={cy} width={CW} height={CH} rx={6} style={{ fill: P.color.card, stroke: hov === tk.pid ? P.color.borderBrand : P.color.borderLight, strokeWidth: 1 }} />
+                    <rect x={-5} y={cy + CH - 2} width={10} height={3} style={{ fill: P.color.card }} />
+                    <rect x={-CW / 2} y={cy} width={3} height={CH} rx={1.5} style={{ fill: isoMix(c, 70) }} />
+                    <text x={-CW / 2 + 9} y={cy + 14} style={{ fontSize: 12, fontWeight: 700, fill: P.color.strong, fontFamily: T.font }}>
+                      {isHead && <tspan style={{ fill: P.color.star }}>★</tspan>}{isoFit(tk.p.name, CW - (isHead ? 50 : 14), 12)}
+                      {isHead && <tspan style={{ fontSize: 11, fontWeight: 600, fill: P.color.brandDeep }}>{` · ${role}`}</tspan>}
+                    </text>
+                    <text x={-CW / 2 + 9} y={cy + 28} style={{ fontSize: 11, fontWeight: 500, fill: P.color.sub, fontFamily: T.font }}>
+                      {isoFit(line2, CW - 14, 11)}
+                    </text>
+                  </g>
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+      </div>
+      <div style={{ padding: "12px 24px", display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+        <span style={{ fontSize: 12, lineHeight: "18px", color: P.color.sub, fontWeight: 600 }}>직군</span>
+        {MORPH_FAMILIES.map(fm => (
+          <span key={`lg-${fm.key}`} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 12, lineHeight: "18px", color: P.color.sub }}>
+            <span style={{ width: 8, height: 8, borderRadius: 2, background: isoMix(fm.color, 70) }} />{fm.label}
+          </span>
+        ))}
+        <span data-iso-hint style={{ fontSize: 12, lineHeight: "18px", color: hp ? P.color.strong : P.color.muted, fontWeight: hp ? 600 : 400 }}>
+          {hp ? `${hp.name}${hp.title ? ` · ${hp.title}` : ""} · ${(teamOf(hp.teamId) || {}).name || ""} · 스쿼드 ${hpSquads.length}개${hpSquads.length ? ` (${hpSquads.map(s => s.name).join(", ")})` : ""}`
+            : `· ★ = 조직장(팀 = 팀장 · 스쿼드 = 리드) · 이름표 둘째 줄 = 팀에서는 직함, 스쿼드에서는 주 소속 팀 · 여러 스쿼드면 블록이 나뉜다 · 점선 판 = 스쿼드 없음 · 끌어서 옮기기${overlay ? " · 끝나면 조직도로 넘어간다" : ""}`}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function Demo() {
+  const [view, setView] = useState("org");
+  const [n, setN] = useState(0);
+  const go = v => { if (v === view) return; setView(v); setN(x => x + 1); };
+  return (
+    <div style={{ minHeight: "100vh", background: P.color.bg, fontFamily: T.font, padding: "32px 40px 40px" }}>
+      <div style={{ maxWidth: 1240, margin: "0 auto" }}>
+        <div style={{ display: "flex", gap: 20, height: 38, alignItems: "center" }}>
+          {[["org", "조직도"], ["squad", "스쿼드"]].map(([v, label]) => (
+            <span key={v} data-top-tab={v} onClick={() => go(v)} style={{ fontSize: P.type.title.fontSize, lineHeight: P.type.title.lineHeight,
+              fontWeight: P.type.title.fontWeight, cursor: "pointer", color: view === v ? P.color.strong : P.color.disabled, transition: "color .15s" }}>{label}</span>
+          ))}
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0 16px", fontSize: 14, lineHeight: "20px" }}>
+          <span style={{ fontWeight: 700, color: P.color.sub }}>PIVIT 스쿼드 «한눈에» 데모</span>
+          <span style={{ color: P.color.disabled }}>·</span>
+          <span style={{ color: P.color.muted, fontWeight: 600 }}>위 탭을 바꿔 보세요 — 기능 조직(팀)의 사람이 목적 조직(스쿼드)으로 다시 모입니다 · 가상 인물 100명 · 기획 시안이라 실제 서비스와 다를 수 있습니다</span>
+        </div>
+        <SquadIsoStage key={n} to={view} animate={n > 0} squads={[]} scaleMode="100" onScale={() => {}} onOpenCard={() => {}} />
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+
+</script>
+</body>
+</html>
