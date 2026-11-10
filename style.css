@@ -603,7 +603,12 @@ html.is-locked { overflow: hidden; }
   .gnb__nav { gap: 21.5px; }
   .gnb { white-space: nowrap; }
   .gnb__nav a { font-size: 14.33px; letter-spacing: -0.43px; }
-  .cta--fixed { display: none; }
+  /* 모바일 고정 Early Access : 화면 하단 중앙에서 올라온다. 크기는 데스크톱(24/40 · 16px)의 80% */
+  .cta--fixed {
+    top: auto; right: auto; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); left: 50%; translate: -50% 0;
+    padding: calc(24px * 0.8) calc(40px * 0.8); font-size: calc(16px * 0.8); letter-spacing: calc(-0.48px * 0.8);
+  }
+  .cta--fixed.is-hidden { transform: translateY(12px); }   /* 숨김 상태는 아래쪽으로 */
 
   /* Hero (393×852 → 화면 높이) */
   .hero { height: auto; min-height: 100svh; padding: 66px 32px 137px; justify-content: center; background-position: center; } /* Figma 30:1060: 패딩 66/137 → 콘텐츠 218~563 */
