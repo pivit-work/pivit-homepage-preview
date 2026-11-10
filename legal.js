@@ -40,9 +40,12 @@
     gnb.addEventListener('transitionend', done);
   };
   const sync = () => { if (canCollapse()) { if (!hover) collapse(); } else { nav.style.opacity = ''; nav.style.pointerEvents = ''; gnb.style.width = ''; collapsed = false; } };
-  gnb.addEventListener('mouseenter', () => { hover = true; if (canCollapse()) expand(); });
+  // hover 는 mouseenter + mousemove 로 잡고(커서가 가만히 있는 자리로 접힌 경우 대비), 포커스는 키보드(:focus-visible)일 때만 펼친다 — main.js 와 동일
+  const hoverOn = () => { hover = true; if (canCollapse() && collapsed) expand(); };
+  gnb.addEventListener('mouseenter', hoverOn);
+  gnb.addEventListener('mousemove', hoverOn);
   gnb.addEventListener('mouseleave', () => { hover = false; collapse(); });
-  gnb.addEventListener('focusin', () => { if (canCollapse()) expand(); });
+  gnb.addEventListener('focusin', (e) => { if (canCollapse() && e.target.matches(':focus-visible')) expand(); });
   gnb.addEventListener('focusout', (e) => { if (!gnb.contains(e.relatedTarget) && !hover) collapse(); });
   mobileMq.addEventListener('change', sync); hoverMq.addEventListener('change', sync);
   // 첫 표시는 애니메이션 없이 접힌 상태로 (폰트 로드 후 폭이 바뀔 수 있어 load 에서 한 번 더)

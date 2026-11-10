@@ -254,11 +254,12 @@
     .call(() => { gnbIntroDone = true; gsap.delayedCall(2, () => { if (!gnbHover) collapseGnb(); }); }, null, 1.45); // 펼쳐진 뒤 2초 후 로고만 남기고 접힘
 
   /* GNB 접힘/펼침 : 인트로 후 로고만 보이는 알약으로 접혀 있다가, 마우스를 올리면(또는 키보드 포커스) 메뉴 폭으로 펼쳐진다. hover 가 없는 터치 기기에서는 항상 펼친 상태 */
-  let gnbIntroDone = false, gnbHover = false;
+  let gnbIntroDone = false, gnbHover = false, gnbCollapsed = false;
   // 접힘은 데스크톱 레이아웃(835px+) + 마우스 환경에서만. 모바일 레이아웃/터치는 호버가 없으니 항상 펼친 상태
   const hoverMq = window.matchMedia('(hover: hover) and (pointer: fine)');
   const canCollapse = () => hoverMq.matches && !mobileMq.matches;
   const expandGnb = () => {
+    gnbCollapsed = false;
     gsap.killTweensOf([gnb, gnbNav]);
     gnbNav.style.pointerEvents = '';
     gsap.to(gnb, { width: measureFull(), duration: 0.55, ease: 'power3.out', onComplete: () => gsap.set(gnb, { clearProps: 'width' }) });
@@ -266,14 +267,19 @@
   };
   const collapseGnb = () => {
     if (!canCollapse()) return;
+    gnbCollapsed = true;
     gsap.killTweensOf([gnb, gnbNav]);
     gnbNav.style.pointerEvents = 'none';                                       // 접힌 동안 알약 밖으로 넘친(투명) 메뉴가 hover 영역이 되지 않게
     gsap.to(gnbNav, { opacity: 0, duration: 0.2, ease: 'power2.in' });
     gsap.to(gnb, { width: compactWidth(), duration: 0.55, ease: 'power3.inOut' });
   };
-  gnb.addEventListener('mouseenter', () => { gnbHover = true; if (gnbIntroDone && canCollapse()) expandGnb(); });
+  // hover 판단은 mouseenter 와 mousemove 둘 다: 커서가 가만히 있는 자리로 GNB 가 내려와 접힌 경우 mouseenter 가 안 와서, 그 상태에서 클릭하면
+  // 로고 링크 포커스(focusin)로만 갑자기 펼쳐지는 일이 있었다 → 조금이라도 움직이면 hover 로 잡고, 포커스는 키보드(:focus-visible)일 때만 펼친다
+  const gnbHoverOn = () => { gnbHover = true; if (gnbIntroDone && canCollapse() && gnbCollapsed) expandGnb(); };
+  gnb.addEventListener('mouseenter', gnbHoverOn);
+  gnb.addEventListener('mousemove', gnbHoverOn);
   gnb.addEventListener('mouseleave', () => { gnbHover = false; if (gnbIntroDone) collapseGnb(); });
-  gnb.addEventListener('focusin', () => { if (gnbIntroDone && canCollapse()) expandGnb(); });
+  gnb.addEventListener('focusin', (e) => { if (gnbIntroDone && canCollapse() && e.target.matches(':focus-visible')) expandGnb(); });
   gnb.addEventListener('focusout', (e) => { if (gnbIntroDone && !gnb.contains(e.relatedTarget) && !gnbHover) collapseGnb(); });
   // 창 크기/입력 환경이 바뀌면 상태 맞추기: 모바일 폭으로 줄면 펼치고, 데스크톱으로 돌아오면 (호버 중이 아닐 때) 접는다
   const syncGnbCollapse = () => { if (!gnbIntroDone) return; if (canCollapse()) { if (!gnbHover) collapseGnb(); } else expandGnb(); };
