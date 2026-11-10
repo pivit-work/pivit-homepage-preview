@@ -537,7 +537,7 @@ html.is-locked { overflow: hidden; }
 /* 두 배경 이미지는 푸터 높이 비율(1122:809)로 나눠 같은 배율로 확대되므로 푸터가 늘어나도 이음새가 맞는다 */
 .footer__bg-top { top: 0; height: 58.105%; object-fit: cover; }
 .footer__bg::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 160px; z-index: 1; background: linear-gradient(180deg, var(--colors-base-white) 0%, var(--colors-base-transparent) 100%); }
-.footer__bg-bottom { top: 58.105%; height: 41.895%; object-fit: cover; }
+.footer__bg-bottom { top: calc(58.105% - 1px); height: calc(41.895% + 2px); object-fit: cover; } /* 위 이미지와 1px 겹치고 아래로 1px 넘치게 — 서브픽셀 반올림으로 바닥·이음새에 흰 선이 비치지 않게 (footer overflow hidden 이 잘라 줌) */
 /* 푸터 내부: 아래부터 쌓는다 — 로고(바닥 54*u) ↑ 140px 고정 ↑ 법적 고지 ↑ 296px 고정 ↑ 메시지/버튼 그룹.
    본문 글자 크기는 고정이라 폭이 줄면 텍스트 줄 수가 늘어나는데, 간격을 고정하고 위로 밀어 올려 겹치지 않게 한다 (1440 기준 Figma 위치와 동일) */
 .footer__inner { position: relative; z-index: 1; min-height: calc(1931 * var(--u)); display: flex; flex-direction: column; justify-content: flex-end; padding-top: calc(300 * var(--u)); /* FAQ 와 겹치는 상단(182*u) + 여유 */ padding-bottom: calc(54 * var(--u)); /* 로고 하단 여백 98 → 54 (사용자 요청) */ }
