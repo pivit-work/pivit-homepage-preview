@@ -19,21 +19,21 @@
   const compactWidth = () => { const cs = getComputedStyle(gnb); return logo.offsetWidth + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight); };
   // 펼친 폭 = 패딩 + 로고 + gap + 메뉴. (폭을 auto 로 바꿨다 되돌리며 재면 트랜지션 시작값이 auto 가 돼 애니메이션 없이 즉시 커진다)
   const measureFull = () => { const cs = getComputedStyle(gnb); return parseFloat(cs.paddingLeft) + logo.offsetWidth + parseFloat(cs.columnGap || cs.gap || '0') + nav.offsetWidth + parseFloat(cs.paddingRight); };
-  const ease = 'cubic-bezier(0.22, 1, 0.36, 1)';
+  const ease = 'cubic-bezier(0.34, 1.25, 0.64, 1)';   // iOS 스프링 느낌의 오버슈트 (main.js 의 back.out 과 맞춤)
   let collapsed = false, hover = false;
   const collapse = (animate = true) => {
     if (!canCollapse()) return;
     collapsed = true;
     nav.style.pointerEvents = 'none';
     nav.style.transition = animate ? 'opacity .2s ease-in' : 'none'; nav.style.opacity = '0';
-    gnb.style.transition = animate ? `width .55s ${ease}` : 'none';
+    gnb.style.transition = animate ? `width .6s ${ease}` : 'none';
     gnb.style.width = gnb.offsetWidth + 'px';           // 현재 폭에서 출발
     requestAnimationFrame(() => { gnb.style.width = compactWidth() + 'px'; });
   };
   const expand = () => {
     collapsed = false;
     nav.style.pointerEvents = '';
-    gnb.style.transition = `width .55s ${ease}`;
+    gnb.style.transition = `width .6s ${ease}`;
     gnb.style.width = measureFull() + 'px';
     nav.style.transition = 'opacity .3s ease-out .12s'; nav.style.opacity = '1';
     const done = () => { if (!collapsed) gnb.style.width = ''; gnb.removeEventListener('transitionend', done); };

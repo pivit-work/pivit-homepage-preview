@@ -20,7 +20,7 @@
   /* ---------- 고정 Early Access 버튼 : 콘텐츠 안 버튼이 보일 때는 숨김 ---------- */
   // 콘텐츠 안 Early Access 버튼(히어로·푸터)이 20% 이상 보이거나, 푸터가 화면에 들어오면 끝까지 숨김
   const fixedCta = document.querySelector('.cta--fixed');
-  const inlineCtas = Array.from(document.querySelectorAll('.cta:not(.cta--fixed)'));
+  const inlineCtas = Array.from(document.querySelectorAll('.cta:not(.cta--fixed):not(.ea-modal__cta)'));   // 모달 안 버튼은 항상 뷰포트 안에 있어 제외
   const footer = document.querySelector('.footer');
   if (fixedCta && inlineCtas.length) {
     const visible = new Set();
@@ -214,6 +214,7 @@
       const target = id ? document.getElementById(id) : document.body;
       if (!target) return;
       e.preventDefault();
+      if (window.eaModalClose) window.eaModalClose();            // Early Access 모달이 열려 있으면 닫고 이동
       // 섹션 상단을 뷰포트 맨 위에 붙이면 제목이 고정 GNB 뒤에 숨는다 → GNB 아래 여백(GNB 하단 + 48)만큼 내려서 멈춘다
       const gnbEl = document.getElementById('gnb');
       const offsetY = id ? Math.round((gnbEl ? gnbEl.getBoundingClientRect().bottom : 0) + 48) : 0;
@@ -249,7 +250,7 @@
     .to(gnb, { y: 0, duration: 0.5, ease: 'back.out(1.3)' }, 0)              // 빠르게 떨어져 작은 반동으로 착지 (제자리에 처음 닿는 시점 ≈ 0.22s)
     .add(makeWobble(0.8), 0.22)                                                // 닿는 순간부터 꿀렁임 : 스크롤 때와 같은 세기·복귀(1.1s) (+ 렌즈 굴절 출렁)
     .call(() => { fullWidth = measureFull(); }, null, 0.54)
-    .to(gnb, { width: () => fullWidth, duration: 0.8, ease: 'power3.inOut' }, 0.55)
+    .to(gnb, { width: () => fullWidth, duration: 0.8, ease: 'back.out(1.0)' }, 0.55)   // 인트로 펼침도 같은 반동
     .to(gnbNav, { opacity: 1, duration: 0.45, ease: 'power2.out' }, 1.0)
     .call(() => { gnbIntroDone = true; gsap.delayedCall(2, () => { if (!gnbHover) collapseGnb(); }); }, null, 1.45); // 펼쳐진 뒤 2초 후 로고만 남기고 접힘
 
@@ -262,7 +263,8 @@
     gnbCollapsed = false;
     gsap.killTweensOf([gnb, gnbNav]);
     gnbNav.style.pointerEvents = '';
-    gsap.to(gnb, { width: measureFull(), duration: 0.55, ease: 'power3.out', onComplete: () => gsap.set(gnb, { clearProps: 'width' }) });
+    // iOS 스프링처럼 목표 폭을 살짝 넘겼다가 돌아오는 반동 (back.out)
+    gsap.to(gnb, { width: measureFull(), duration: 0.6, ease: 'back.out(1.05)', onComplete: () => gsap.set(gnb, { clearProps: 'width' }) });
     gsap.to(gnbNav, { opacity: 1, duration: 0.3, ease: 'power2.out', delay: 0.12 });
   };
   const collapseGnb = () => {
@@ -271,7 +273,7 @@
     gsap.killTweensOf([gnb, gnbNav]);
     gnbNav.style.pointerEvents = 'none';                                       // 접힌 동안 알약 밖으로 넘친(투명) 메뉴가 hover 영역이 되지 않게
     gsap.to(gnbNav, { opacity: 0, duration: 0.2, ease: 'power2.in' });
-    gsap.to(gnb, { width: compactWidth(), duration: 0.55, ease: 'power3.inOut' });
+    gsap.to(gnb, { width: compactWidth(), duration: 0.6, ease: 'back.out(0.9)' });   // 접힐 때도 살짝 더 줄었다가 제자리로
   };
   // hover 판단은 mouseenter 와 mousemove 둘 다: 커서가 가만히 있는 자리로 GNB 가 내려와 접힌 경우 mouseenter 가 안 와서, 그 상태에서 클릭하면
   // 로고 링크 포커스(focusin)로만 갑자기 펼쳐지는 일이 있었다 → 조금이라도 움직이면 hover 로 잡고, 포커스는 키보드(:focus-visible)일 때만 펼친다
@@ -626,6 +628,7 @@
     /* 상세 모달 */
     const modal = document.getElementById('s4-modal');
     const backdrop = document.getElementById('s4-backdrop');
+    const closeBtn = document.querySelector('.s4__close');
     const bodies = modal ? Array.from(modal.querySelectorAll('.s4__modal-body')) : [];
     // 모달이 열린 동안 페이지 스크롤 잠금 (스크롤은 모달 안에서만), 바깥 클릭/ESC/X 로 닫힘 (0.2s)
     let lockedY = 0;
@@ -640,6 +643,7 @@
       lockPage();
       gsap.fromTo(modal, { y: 24, scale: 0.98, autoAlpha: 0 }, { y: 0, scale: 1, autoAlpha: 1, duration: 0.45, ease: 'power3.out' });
       if (backdrop) gsap.fromTo(backdrop, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.45, ease: 'power2.out' });
+      if (closeBtn) { closeBtn.hidden = false; gsap.fromTo(closeBtn, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.45, ease: 'power2.out' }); }
     };
     const closeModal = () => {
       if (!modal.classList.contains('is-open')) return;
@@ -647,10 +651,11 @@
       unlockPage();
       gsap.to(modal, { y: 16, scale: 0.98, autoAlpha: 0, duration: 0.2, ease: 'power2.in' });
       if (backdrop) gsap.to(backdrop, { autoAlpha: 0, duration: 0.2, ease: 'power2.in' });
+      if (closeBtn) gsap.to(closeBtn, { autoAlpha: 0, duration: 0.2, ease: 'power2.in', onComplete: () => { closeBtn.hidden = true; } });
     };
     document.querySelectorAll('.s4__more').forEach((btn) => btn.addEventListener('click', (e) => { e.stopPropagation(); openModal(btn.dataset.modal); }));
     if (modal) {
-      modal.querySelector('.s4__close').addEventListener('click', closeModal);
+      if (closeBtn) closeBtn.addEventListener('click', (e) => { e.stopPropagation(); closeModal(); });
       modal.addEventListener('click', (e) => e.stopPropagation());
       document.addEventListener('click', () => closeModal());                 // 모달 바깥 클릭
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
@@ -661,6 +666,39 @@
       const SCROLL_KEYS = [' ', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'];
       window.addEventListener('keydown', (e) => { if (modal.classList.contains('is-open') && SCROLL_KEYS.includes(e.key) && !modal.contains(e.target)) e.preventDefault(); });
     }
+  }
+
+  /* ---------- Early Access 풀 모달 (Figma 72:4525) : 버튼 3개가 열고, X·ESC·바깥(16px 여백) 클릭으로 닫힘. 페이지 스크롤은 잠그고 모달 안에서만 스크롤 ---------- */
+  const eaModal = document.getElementById('ea-modal');
+  if (eaModal) {
+    let eaLockedY = 0;
+    const eaOpen = () => {
+      if (eaModal.classList.contains('is-open')) return;
+      eaLockedY = window.scrollY; document.documentElement.classList.add('is-locked');
+      eaModal.classList.add('is-open'); eaModal.setAttribute('aria-hidden', 'false');
+      eaModal.querySelector('.ea-modal__scroll').scrollTop = 0;
+      if (fixedCta) fixedCta.classList.add('is-modal');
+      gsap.fromTo(eaModal, { y: 24, scale: 0.985, autoAlpha: 0 }, { y: 0, scale: 1, autoAlpha: 1, duration: 0.45, ease: 'power3.out' });
+      eaModal.querySelector('.ea-modal__close').focus({ preventScroll: true });
+    };
+    const eaClose = () => {
+      if (!eaModal.classList.contains('is-open')) return;
+      eaModal.classList.remove('is-open'); eaModal.setAttribute('aria-hidden', 'true');
+      document.documentElement.classList.remove('is-locked'); if (Math.abs(window.scrollY - eaLockedY) > 1) window.scrollTo(0, eaLockedY);
+      if (fixedCta) fixedCta.classList.remove('is-modal');
+      gsap.to(eaModal, { y: 16, scale: 0.985, autoAlpha: 0, duration: 0.2, ease: 'power2.in' });
+    };
+    window.eaModalClose = eaClose;
+    document.querySelectorAll('a.cta[href="early-access/"]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); eaOpen(); }));
+    eaModal.querySelector('.ea-modal__close').addEventListener('click', eaClose);
+    eaModal.addEventListener('click', (e) => e.stopPropagation());
+    document.addEventListener('click', (e) => { if (eaModal.classList.contains('is-open') && !document.getElementById('gnb').contains(e.target)) eaClose(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') eaClose(); });
+    const eaBlock = (e) => { if (eaModal.classList.contains('is-open') && !eaModal.contains(e.target)) e.preventDefault(); };
+    window.addEventListener('wheel', eaBlock, { passive: false });
+    window.addEventListener('touchmove', eaBlock, { passive: false });
+    const EA_KEYS = [' ', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'];
+    window.addEventListener('keydown', (e) => { if (eaModal.classList.contains('is-open') && EA_KEYS.includes(e.key) && !eaModal.contains(e.target)) e.preventDefault(); });
   }
 
   /* ---------- Section 5 : 카드 등장 + 패럴랙스 ---------- */

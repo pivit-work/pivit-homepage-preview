@@ -93,11 +93,20 @@ details summary::-webkit-details-marker { display: none; }
   backdrop-filter: blur(1.5px) var(--lg-filter, saturate(1.5));
   transition: opacity .35s var(--ease), transform .35s var(--ease), background-color .2s;
 }
+/* 호버 색 전환: 그라디언트는 CSS 로 보간되지 않아 즉시 바뀌므로, 호버용 그라디언트를 ::after 레이어에 두고 투명도만 페이드한다 */
 .cta--fixed:hover {
+  background:
+    linear-gradient(180deg, var(--colors-foreground-fgBrandPrimary) 30.13%, color-mix(in srgb, var(--colors-foreground-fgBrandPrimary) 10%, transparent) 118.24%),
+    var(--componentColors-alpha-alphaWhite10);   /* .cta:hover 의 단색 배경이 덮어쓰지 않게 기본 그라디언트 유지 */
+}
+.cta--fixed::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: -1; pointer-events: none;
   background:
     linear-gradient(180deg, var(--colors-background-bgBrandSolidHover) 30.13%, color-mix(in srgb, var(--colors-background-bgBrandSolidHover) 10%, transparent) 118.24%),
     var(--componentColors-alpha-alphaWhite20);
+  opacity: 0; transition: opacity .3s var(--ease);
 }
+.cta--fixed:hover::after { opacity: 1; }
 /* 굴절이 없는 브라우저(사파리 등, html.no-refract — glass.js)는 GNB 와 같은 프로스트 블러 폴백 */
 .no-refract .cta--fixed {
   -webkit-backdrop-filter: blur(5px) saturate(1.5);
@@ -121,6 +130,7 @@ details summary::-webkit-details-marker { display: none; }
   display: flex; align-items: center; gap: 48px;
   padding: 24px 40px;
   border-radius: 9999px;
+  overflow: hidden;            /* 접히는 동안 메뉴 텍스트가 알약 밖으로 비어져 나오지 않게 알약 모양으로 클립 */
   isolation: isolate;
   box-shadow: var(--shadow-3xl);
   backdrop-filter: blur(40px) saturate(1.4);
@@ -367,9 +377,26 @@ html:not(.no-js) .bg-defer:not(.is-near) { background-image: none !important; }
 .s4__modal-scroll::-webkit-scrollbar-track { background: transparent; }
 .s4__modal-scroll::-webkit-scrollbar-thumb { background: var(--componentColors-alpha-alphaBlack40); border-radius: 9999px; }
 .s4__modal.is-open { visibility: visible; }
+/* ---------- Early Access 풀 모달 (Figma 72:4525) : 뷰포트 16px 안쪽 전체, 라운드 24, 모달 그라디언트. GNB(z 50) 아래에 두어 디자인처럼 GNB 가 위에 보인다 ---------- */
+.ea-modal {
+  position: fixed; inset: 16px; z-index: 45; border-radius: 24px; overflow: hidden;
+  background: linear-gradient(180deg, var(--colors-background-bgPrimary) 0%, var(--colors-background-bgPrimary) 33%, var(--colors-brand-100) 78%, var(--colors-brand-200) 100%);
+  visibility: hidden; opacity: 0;
+}
+/* 스크롤은 모달 안에서만 (overscroll-behavior 로 바깥 전파 차단) */
+.ea-modal__scroll { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; display: flex; align-items: center; justify-content: center; padding: 96px 64px 64px; }   /* 좌우 64 = 프레임 40 + 텍스트 프레임 24 (Figma 수정본) */
+.ea-modal__content { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; text-align: center; word-break: keep-all; }
+.ea-modal__title { color: var(--web-gray-900); }
+.ea-modal__sub { color: var(--colors-foreground-fgBrandPrimaryAlt); }
+.ea-modal__desc { font-size: 14px; line-height: 20px; font-weight: 600; color: var(--colors-text-textSecondary); }
+.ea-modal__cta { margin-top: 24px; }                                        /* 본문 → 버튼 40 (gap 16 + 24) */
+.ea-modal__close { position: absolute; top: 32px; right: 32px; width: 33px; height: 33px; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.cta--fixed.is-modal { opacity: 0 !important; pointer-events: none !important; }   /* 모달이 열린 동안 우상단 버튼 숨김 */
+
 /* 모달 열림: 페이지 스크롤 잠금 (scrollY 는 유지 — ScrollTrigger 상태 보존) */
 html.is-locked { overflow: hidden; }
-.s4__close { position: absolute; top: 29px; right: 26px; width: 33px; height: 33px; padding: 0; border: 0; background: transparent; cursor: pointer; z-index: 1; }
+.s4__close { position: fixed; top: 32px; right: 32px; width: 33px; height: 33px; padding: 0; border: 0; background: transparent; cursor: pointer; z-index: 81; visibility: hidden; opacity: 0; } /* 모달 밖 뷰포트 우상단 (Figma 15:8557), 모달과 함께 autoAlpha */
+.s4__close[hidden] { display: block; }   /* 초기 hidden 속성은 JS 가 autoAlpha 로 제어하므로 display 는 유지 */
 .s4__modal-body { display: flex; flex-direction: column; gap: 33px; width: 503px; }
 .s4__modal-body[hidden] { display: none; }
 .s4__modal-body .h3 { color: var(--web-gray-900); }
@@ -649,6 +676,11 @@ html.is-locked { overflow: hidden; }
   .s4__mock-m--2 { left: 6.57%; top: 55.8%; width: 87.44%; border-radius: 4.5px; box-shadow: var(--web-shadow-modal-m); }
   .s4__mock-m--3 { left: 6.7%; top: 64.1%; width: 87.2%; border-radius: 4.6px; }
   .s4__modal { width: calc(100vw - 32px); left: 16px; }
+  .ea-modal { z-index: 55; }                      /* 모바일은 GNB 가 폭 전체를 차지해 X 를 가리므로 모달을 GNB 위로 */
+  .ea-modal__scroll { padding: 88px 24px 48px; }
+  .ea-modal__close { top: 24px; right: 24px; }
+  .ea-modal__desc br { display: none; }           /* 좁은 폭에서는 자연 줄바꿈 */
+  .ea-modal__title { font-size: 32px; line-height: 1.33; letter-spacing: 0; }   /* Mobile/H0 (32 · 1.33 · 자간 0) — 디자이너 지정 */
   .s4__modal-scroll { padding: 60px 18px 32px 24px; }
   .s4__modal-body { width: 100%; }
 
