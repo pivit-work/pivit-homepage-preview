@@ -1,0 +1,14 @@
+{
+ "no": 25,
+ "category": "general",
+ "title": "[dev확인 PW-2284] 회사 공고 게시 확인",
+ "body": "dev 확인용 공고 본문입니다.\nhttps://example.com <b>태그</b> 는 글자 그대로",
+ "publishedAt": "2026-10-28T08:02:01.000Z",
+ "periodBasis": "three_months",
+ "periodEndsOn": "2027-01-28",
+ "correctedBy": [
+  {
+   "no": 26
+  }
+ ]
+}

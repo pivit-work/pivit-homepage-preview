@@ -1,0 +1,12 @@
+{
+ "no": 26,
+ "category": "general",
+ "title": "[정정] 제25호 «[dev확인 PW-2284] 회사 공고 게시 확인»",
+ "body": "제25호 공고(2026-10-28)의 다음 부분을 정정합니다.\ndev 확인용 정정 초안",
+ "publishedAt": "2026-10-28T08:10:00.000Z",
+ "periodBasis": "three_months",
+ "periodEndsOn": "2027-03-01",
+ "corrects": {
+  "no": 25
+ }
+}

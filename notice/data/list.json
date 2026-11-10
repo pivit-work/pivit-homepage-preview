@@ -1,0 +1,247 @@
+{
+ "items": [
+  {
+   "no": 27,
+   "category": "general",
+   "title": "예약해 둔 공고",
+   "publishedAt": "2026-11-03T14:13:00.000Z",
+   "periodEndsOn": "2027-05-15",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 26,
+   "category": "general",
+   "title": "[정정] 제25호 «[dev확인 PW-2284] 회사 공고 게시 확인»",
+   "publishedAt": "2026-10-28T08:10:00.000Z",
+   "periodEndsOn": "2027-03-01",
+   "isCorrection": true,
+   "isCorrected": false
+  },
+  {
+   "no": 25,
+   "category": "general",
+   "title": "[dev확인 PW-2284] 회사 공고 게시 확인",
+   "publishedAt": "2026-10-28T08:02:01.000Z",
+   "periodEndsOn": "2027-01-28",
+   "isCorrection": false,
+   "isCorrected": true
+  },
+  {
+   "no": 24,
+   "category": "general",
+   "title": "일반 공고 예시 20",
+   "publishedAt": "2026-10-27T14:15:08.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 23,
+   "category": "general",
+   "title": "일반 공고 예시 19",
+   "publishedAt": "2026-10-27T14:15:08.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 22,
+   "category": "general",
+   "title": "일반 공고 예시 18",
+   "publishedAt": "2026-10-27T14:15:08.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 21,
+   "category": "general",
+   "title": "일반 공고 예시 17",
+   "publishedAt": "2026-10-27T14:15:07.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 20,
+   "category": "general",
+   "title": "일반 공고 예시 16",
+   "publishedAt": "2026-10-27T14:15:07.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 19,
+   "category": "general",
+   "title": "일반 공고 예시 15",
+   "publishedAt": "2026-10-27T14:15:07.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 18,
+   "category": "general",
+   "title": "일반 공고 예시 14",
+   "publishedAt": "2026-10-27T14:15:07.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 17,
+   "category": "general",
+   "title": "일반 공고 예시 13",
+   "publishedAt": "2026-10-27T14:15:07.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 16,
+   "category": "general",
+   "title": "일반 공고 예시 12",
+   "publishedAt": "2026-10-27T14:15:07.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 15,
+   "category": "general",
+   "title": "일반 공고 예시 11",
+   "publishedAt": "2026-10-27T14:15:07.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 14,
+   "category": "general",
+   "title": "일반 공고 예시 10",
+   "publishedAt": "2026-10-27T14:15:07.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 13,
+   "category": "general",
+   "title": "일반 공고 예시 9",
+   "publishedAt": "2026-10-27T14:15:07.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 12,
+   "category": "general",
+   "title": "일반 공고 예시 8",
+   "publishedAt": "2026-10-27T14:15:07.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 11,
+   "category": "general",
+   "title": "일반 공고 예시 7",
+   "publishedAt": "2026-10-27T14:15:07.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 10,
+   "category": "general",
+   "title": "일반 공고 예시 6",
+   "publishedAt": "2026-10-27T14:15:07.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 9,
+   "category": "general",
+   "title": "일반 공고 예시 5",
+   "publishedAt": "2026-10-27T14:15:07.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 8,
+   "category": "general",
+   "title": "일반 공고 예시 4",
+   "publishedAt": "2026-10-27T14:15:07.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 7,
+   "category": "general",
+   "title": "일반 공고 예시 3",
+   "publishedAt": "2026-10-27T14:15:07.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 6,
+   "category": "general",
+   "title": "일반 공고 예시 2",
+   "publishedAt": "2026-10-27T14:15:07.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 5,
+   "category": "general",
+   "title": "일반 공고 예시 1",
+   "publishedAt": "2026-10-27T14:15:07.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 4,
+   "category": "general",
+   "title": "주주명부 기준일 설정 공고 재정정",
+   "publishedAt": "2026-10-27T14:12:23.000Z",
+   "periodEndsOn": "2027-02-04",
+   "isCorrection": true,
+   "isCorrected": false
+  },
+  {
+   "no": 3,
+   "category": "settlement",
+   "title": "제1기 대차대조표 공고",
+   "publishedAt": "2026-10-26T14:12:23.000Z",
+   "periodEndsOn": "2028-10-25",
+   "isCorrection": false,
+   "isCorrected": false
+  },
+  {
+   "no": 2,
+   "category": "general",
+   "title": "주주명부 기준일 설정 공고 정정",
+   "publishedAt": "2026-08-29T14:12:23.000Z",
+   "periodEndsOn": "2026-09-17",
+   "isCorrection": true,
+   "isCorrected": false
+  },
+  {
+   "no": 1,
+   "category": "general",
+   "title": "주주명부 기준일 설정 공고",
+   "publishedAt": "2026-08-28T14:12:23.000Z",
+   "periodEndsOn": "2026-09-17",
+   "isCorrection": false,
+   "isCorrected": true
+  }
+ ]
+}
