@@ -1,0 +1,14 @@
+{
+ "no": 3,
+ "category": "settlement",
+ "title": "제1기 대차대조표 공고",
+ "body": "상법 제449조 제3항에 따라 제1기 대차대조표를 공고합니다.\n\n대차대조표는 첨부 파일로 싣습니다.\n\n(시험용 예시 공고입니다.)",
+ "publishedAt": "2026-10-26T14:12:23.000Z",
+ "periodBasis": "settlement_two_years",
+ "periodEndsOn": "2028-10-25",
+ "attachment": {
+  "name": "제1기_대차대조표.pdf",
+  "size": 193,
+  "url": "/notice/files/3/%EC%A0%9C1%EA%B8%B0_%EB%8C%80%EC%B0%A8%EB%8C%80%EC%A1%B0%ED%91%9C.pdf"
+ }
+}

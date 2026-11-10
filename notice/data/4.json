@@ -1,0 +1,12 @@
+{
+ "no": 4,
+ "category": "general",
+ "title": "주주명부 기준일 설정 공고 재정정",
+ "body": "제1호 공고의 «기준일» 항목을 다시 정정합니다.\n\n(시험용 예시 공고입니다.)",
+ "publishedAt": "2026-10-27T14:12:23.000Z",
+ "periodBasis": "three_months",
+ "periodEndsOn": "2027-02-04",
+ "corrects": {
+  "no": 1
+ }
+}

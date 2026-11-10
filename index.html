@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="ko" class="no-js">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-cache" />
+  <script>document.documentElement.classList.remove("no-js");</script>
+  <title>Pivit(피빗) — 회사의 사람과 시간, 한눈에 보입니다</title>
+  <meta name="description" content="누가 어디에 시간을 쓰는지, 새 일을 맡길 사람은 누구인지, 그 시간이 목표로 이어지는지. 팀이 남기는 기록으로 한 화면에 봅니다." />
+  <link rel="canonical" href="https://stresslee.github.io/pivit/" />
+  <!-- Open Graph / Twitter (커스텀 도메인 연결 시 og:url·og:image·canonical 의 절대 URL 을 바꿀 것) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Pivit" />
+  <meta property="og:locale" content="ko_KR" />
+  <meta property="og:url" content="https://stresslee.github.io/pivit/" />
+  <meta property="og:title" content="Pivit(피빗) — 회사의 사람과 시간, 한눈에 보입니다" />
+  <meta property="og:description" content="누가 어디에 시간을 쓰는지, 새 일을 맡길 사람은 누구인지, 그 시간이 목표로 이어지는지. 팀이 남기는 기록으로 한 화면에 봅니다." />
+  <meta property="og:image" content="https://stresslee.github.io/pivit/assets/og.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Pivit 로고 — 푸른 언덕 위에서 컴퓨터로 일하는 사람" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Pivit(피빗) — 회사의 사람과 시간, 한눈에 보입니다" />
+  <meta name="twitter:description" content="누가 어디에 시간을 쓰는지, 새 일을 맡길 사람은 누구인지, 그 시간이 목표로 이어지는지. 팀이 남기는 기록으로 한 화면에 봅니다." />
+  <meta name="twitter:image" content="https://stresslee.github.io/pivit/assets/og.png" />
+  <link rel="icon" href="assets/logo-symbol.svg" type="image/svg+xml" />
+  <link rel="preload" as="image" href="assets/hero-bg.webp" fetchpriority="high" /> <!-- 첫 화면 배경을 가장 먼저 -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+  <link rel="stylesheet" href="tokens.css?v=20261114a" />
+  <link rel="stylesheet" href="tokens-dark.css?v=20261114a" />
+  <link rel="stylesheet" href="style.css?v=20261114a" />
+</head>
+<body>
+
+<!-- ===== GNB ===== -->
+<header class="gnb is-dark gnb--intro" id="gnb">
+  <a class="gnb__logo" href="#top" aria-label="pivit 홈">
+    <img class="gnb__symbol" src="assets/logo-symbol.svg" alt="" />
+    <img class="gnb__lettermark" src="assets/logo-lettermark.svg" alt="pivit" />
+    <img class="gnb__symbol gnb__symbol--light" src="assets/logo-symbol-white.svg" alt="" />
+    <img class="gnb__lettermark gnb__lettermark--light" src="assets/logo-lettermark-white.svg" alt="" />
+  </a>
+  <nav class="gnb__nav" aria-label="주요 메뉴">
+    <a href="#how">작동방식</a>
+    <a href="#features">기능</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+</header>
+<a class="cta cta--fixed is-hidden" href="#early-access">Early Access</a>
+
+<main id="top">
+
+<!-- ===== Hero ===== -->
+<section class="hero">
+  <div class="hero__content">
+    <p class="hero__eyebrow">대표를 위한 조직 운영 체제</p>
+    <h1 class="hero__title split-lines">우리 회사의 사람과 시간,<br />한눈에 보여요</h1> <!-- Figma 67:3386: 유휴 5초 후 회사→🏢 사람→🧑‍💻 시간→⏰ 보여→👀 (main.js) -->
+    <div class="hero__desc">
+      <p>누가 어떤 일을 하는지, 새 일을 맡길 사람이 있는지, 그 일이 목표로 이어지는지. 보고서 없이 팀이 남긴 기록만으로 알 수 있어요.</p>
+      <p class="hero__note">얼리 액세스 동안 무료, 정식 출시 후에도 3개월 더 무료예요</p>
+    </div>
+    <a class="cta" href="#early-access">Early Access</a>
+  </div>
+  <a class="hero__scroll" href="#video" aria-label="아래로 스크롤"><img src="assets/hero-chevron.svg" width="87" height="47" alt="" /></a>
+</section>
+
+<!-- ===== Video ===== -->
+<section class="video" id="video">
+  <div class="video__bg"></div>
+  <div class="video__frame">
+    <video class="video__player" poster="assets/video-poster@3x.webp" playsinline muted loop preload="none" aria-label="pivit 제품 소개 영상">
+      <!-- TODO: 영상 파일 경로 연결 -->
+    </video>
+  </div>
+</section>
+
+<!-- ===== Section 1 : 문제 제기 ===== -->
+<section class="s1" id="s1">
+  <div class="wrap s1__lines">
+    <p class="s1__line">조직이 커질수록 대표에게 올라오는 숫자는</p>
+    <p class="s1__line">인원수와 비용으로 줄어듭니다.</p>
+    <p class="s1__line">판단에 필요한 것은 어느 일에 누가 얼마나 붙어 있고,</p>
+    <p class="s1__line">덜 쓰이는 사람은 없는지,</p>
+    <p class="s1__line">그 일이 목표에 다가가고 있는지입니다.</p>
+  </div>
+</section>
+
+<!-- ===== Section 2 : 세 가지 질문 ===== -->
+<section class="s2 wrap" id="s2">
+  <h2 class="h1 split-lines">그래서 대표님이 알고 싶은<br />인원과 비용 다음 세가지는</h2>
+  <div class="s2__grid reveal">
+    <article class="s2__card">
+      <div class="s2__visual"><img src="assets/s2-card1@2x.webp" width="409" height="341" alt="" loading="lazy" decoding="async" /></div>
+      <div class="s2__text">
+        <h3 class="h3">누가 어떤 일에 시간을 쓰고 있을까?</h3>
+        <p class="body">한 사람이 여러 프로젝트에 걸쳐 있으면, 회사 전체에서 어느 일에 얼마만큼의 사람이 들어가 있는지 어느 보고서에도 합쳐져 있지 않습니다.</p>
+      </div>
+    </article>
+    <article class="s2__card">
+      <div class="s2__visual"><img src="assets/s2-card2@2x.webp" width="409" height="341" alt="" loading="lazy" decoding="async" /></div>
+      <div class="s2__text">
+        <h3 class="h3">새 일을 맡길 사람이 있을까?</h3>
+        <p class="body">새 일을 맡길 수 있는 사람이 있는데도 보이지 않으면, 사람을 더 뽑거나 이미 바쁜 사람에게 일을 얹게 됩니다.</p>
+      </div>
+    </article>
+    <article class="s2__card">
+      <div class="s2__visual s2__visual--target"><img src="assets/s2-card3@2x.png" width="409" height="341" alt="" loading="lazy" decoding="async" /><img class="s2__target" src="assets/s2-card3-target.svg" width="174" height="136" alt="" loading="lazy" decoding="async" /></div>
+      <div class="s2__text">
+        <h3 class="h3">그 시간이 목표로 이어지고 있을까?</h3>
+        <p class="body">모두 바빠도 회사 목표와 이어져 있지 않으면 목표는 그대로입니다. 매일의 기록이 쌓여 있어야 성과를 기억이 아니라 사실로 이야기할 수 있습니다.</p>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ===== Logos ===== -->
+<div class="logos" aria-hidden="true">
+  <div class="logos__track">
+    <img src="assets/logos-strip.png" width="1811" height="112" alt="" loading="lazy" decoding="async" />
+    <img src="assets/logos-strip.png" width="1811" height="112" alt="" loading="lazy" decoding="async" />
+  </div>
+</div>
+
+<!-- ===== Section 3 : 작동방식 ===== -->
+<section class="s3" id="how">
+  <div class="s3__sticky wrap">
+    <h2 class="h1 split-lines">기록하면 모이고, 보이고,<br /> 대화로 이어져요.</h2>
+    <!-- 모바일 전용 탭 (Figma 30:1891) — 데스크톱은 좌측 스텝 목록 -->
+    <div class="s3__tabs" role="tablist" aria-label="작동방식">
+      <button class="s3__tab is-active" type="button" role="tab" data-step="0" aria-selected="true">기록</button>
+      <button class="s3__tab" type="button" role="tab" data-step="1" aria-selected="false">합산</button>
+      <button class="s3__tab" type="button" role="tab" data-step="2" aria-selected="false">확인</button>
+      <button class="s3__tab" type="button" role="tab" data-step="3" aria-selected="false">대화</button>
+    </div>
+    <div class="s3__body">
+      <ol class="s3__steps" role="tablist" aria-label="작동방식">
+        <li class="s3__step is-active" data-step="0" role="tab" id="s3-tab-0" aria-controls="s3-pane-0" aria-selected="true" tabindex="0">
+          <div class="s3__step-head">
+            <div class="s3__step-title"><img class="s3__icon s3__icon--off" src="assets/s3-icon-record-off.svg" width="30" height="30" alt="" loading="lazy" decoding="async" /><img class="s3__icon s3__icon--on" src="assets/s3-icon-record-on.svg" width="30" height="30" alt="" loading="lazy" decoding="async" /><span class="h3 s3__step-name">기록</span></div>
+            <p class="body">매일 스니핏, 매달 투입 비율</p>
+          </div>
+          <span class="s3__bar"><i></i></span>
+        </li>
+        <li class="s3__step" data-step="1" role="tab" id="s3-tab-1" aria-controls="s3-pane-1" aria-selected="false" tabindex="-1">
+          <div class="s3__step-head">
+            <div class="s3__step-title"><img class="s3__icon s3__icon--off" src="assets/s3-icon-sum-off.svg" width="30" height="30" alt="" loading="lazy" decoding="async" /><img class="s3__icon s3__icon--on" src="assets/s3-icon-sum-on.svg" width="30" height="30" alt="" loading="lazy" decoding="async" /><span class="h3 s3__step-name">합산</span></div>
+            <p class="body">사람 · 팀 · 조직 단위로 모와서</p>
+          </div>
+          <span class="s3__bar"><i></i></span>
+        </li>
+        <li class="s3__step" data-step="2" role="tab" id="s3-tab-2" aria-controls="s3-pane-2" aria-selected="false" tabindex="-1">
+          <div class="s3__step-head">
+            <div class="s3__step-title"><img class="s3__icon s3__icon--off" src="assets/s3-icon-check-off.svg" width="30" height="30" alt="" loading="lazy" decoding="async" /><img class="s3__icon s3__icon--on" src="assets/s3-icon-check-on.svg" width="30" height="30" alt="" loading="lazy" decoding="async" /><span class="h3 s3__step-name">확인</span></div>
+            <p class="body">조직 현황과 OKR 진척을 한 화면에</p>
+          </div>
+          <span class="s3__bar"><i></i></span>
+        </li>
+        <li class="s3__step" data-step="3" role="tab" id="s3-tab-3" aria-controls="s3-pane-3" aria-selected="false" tabindex="-1">
+          <div class="s3__step-head">
+            <div class="s3__step-title"><img class="s3__icon s3__icon--off" src="assets/s3-icon-talk-off.svg" width="30" height="30" alt="" loading="lazy" decoding="async" /><img class="s3__icon s3__icon--on" src="assets/s3-icon-talk-on.svg" width="30" height="30" alt="" loading="lazy" decoding="async" /><span class="h3 s3__step-name">대화</span></div>
+            <p class="body">1on1 과 피드백으로 다음 일을 정합니다</p>
+          </div>
+          <span class="s3__bar"><i></i></span>
+        </li>
+      </ol>
+      <div class="s3__stage">
+        <!-- 패널 1 (Figma 36:8151) : 배경 + export 프레임 이미지(3x export → 2x) -->
+        <div class="s3__pane s3__pane--1 is-active bg-defer" data-pane="0" role="tabpanel" id="s3-pane-0" aria-labelledby="s3-tab-0" aria-hidden="false">
+          <img class="s3__img s3__img--p1a" src="assets/s3-p1-app@2x.webp" width="897" height="545" alt="" loading="lazy" decoding="async" />
+          <img class="s3__img s3__img--p1b" src="assets/s3-p1-modal@2x.webp" width="804" height="626" alt="" loading="lazy" decoding="async" />
+        </div>
+        <!-- 패널 2 (Figma 36:8207) : 배경 + export 프레임 이미지(3x export → 2x) -->
+        <div class="s3__pane s3__pane--2 bg-defer" data-pane="1" role="tabpanel" id="s3-pane-1" aria-labelledby="s3-tab-1" aria-hidden="true">
+          <img class="s3__img s3__img--p2a" src="assets/s3-p2-card1@2x.webp" width="704" height="590" alt="" loading="lazy" decoding="async" />
+          <img class="s3__img s3__img--p2b" src="assets/s3-p2-card2@2x.webp" width="591" height="495" alt="" loading="lazy" decoding="async" />
+        </div>
+        <!-- 패널 3 (Figma 36:8558) : 배경 + export 프레임 이미지(3x export → 2x) -->
+        <div class="s3__pane s3__pane--3 bg-defer" data-pane="2" role="tabpanel" id="s3-pane-2" aria-labelledby="s3-tab-2" aria-hidden="true">
+          <img class="s3__img s3__img--p3a" src="assets/s3-p3-okr@2x.webp" width="842" height="625" alt="" loading="lazy" decoding="async" />
+        </div>
+        <!-- 패널 4 (Figma 36:8840) : 배경 + export 프레임 이미지(3x export → 2x) -->
+        <div class="s3__pane s3__pane--4 bg-defer" data-pane="3" role="tabpanel" id="s3-pane-3" aria-labelledby="s3-tab-3" aria-hidden="true">
+          <img class="s3__img s3__img--p4a" src="assets/s3-p4-dash@2x.webp" width="889" height="583" alt="" loading="lazy" decoding="async" />
+        </div>
+      </div>
+      <!-- 모바일: 현재 스텝 설명 (Figma 30:1152) -->
+      <div class="s3__current" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Section 4 : 스크롤 스토리 (3 슬라이드) + 상세 모달 ===== -->
+<section class="s4" id="s4">
+  <div class="s4__sticky">
+    <div class="s4__stage">
+      <div class="s4__card" data-slide="0">
+        <!-- 슬라이드 1 -->
+        <article class="s4__slide is-active" data-index="0" style="--bg: url('assets/s4-bg.webp')">
+          <div class="s4__bg bg-defer"></div>
+          <div class="s4__head">
+            <p class="s4__eyebrow">그러면 사람이 어디에 쓰이고 있는지?</p>
+            <h2 class="h1 s4__title">조직과 프로젝트마다,<br />사람이 얼마나 붙어 있는지 봅니다</h2>
+          <button class="s4__more" type="button" data-modal="0">자세히</button>
+          </div>
+          <img class="s4__mock s4__mock--1" src="assets/s4-mock-1.png" width="1047" height="498" alt="" loading="lazy" decoding="async" />
+          <img class="s4__mock-m s4__mock-m--1" src="assets/s4-mock-1-m@3x.webp" width="309" height="233" alt="" loading="lazy" decoding="async" />
+        </article>
+        <!-- 슬라이드 2 -->
+        <article class="s4__slide" data-index="1" style="--bg: url('assets/s4-bg-2.webp')">
+          <div class="s4__bg bg-defer"></div>
+          <div class="s4__head">
+            <p class="s4__eyebrow">새 일을 맡길 사람이 있나요?</p>
+            <h2 class="h1 s4__title">투입 70% 미만이면<br />「여유」로 바로 보입니다</h2>
+          <p class="s4__caption">한 일에 80% 넘게 묶이면 「쏠림」, 아직 적지 않았으면 「미입력」입니다.</p>
+          <button class="s4__more s4__more--low" type="button" data-modal="1">자세히</button>
+          </div>
+          <img class="s4__mock s4__mock--2" src="assets/s4-mock-2@3x.webp" width="1258" height="515" alt="" loading="lazy" decoding="async" />
+          <img class="s4__mock-m s4__mock-m--2" src="assets/s4-mock-2-m@3x.webp" width="300" height="233" alt="" loading="lazy" decoding="async" />
+        </article>
+        <!-- 슬라이드 3 -->
+        <article class="s4__slide" data-index="2" style="--bg: url('assets/s4-bg-3.webp')">
+          <div class="s4__bg bg-defer"></div>
+          <div class="s4__head">
+            <p class="s4__eyebrow">그 시간이 목표로 이어지고 있을까?</p>
+            <h2 class="h1 s4__title">회사 목표가 개인 목표까지<br />이어졌는지 바로 보여요</h2>
+          <p class="s4__caption">아무 팀도 이어받지 않은 회사 KR에는 ‘미정렬’이 붙어요. KR마다 누가 기여하고 있는지도 보여요.</p>
+          <button class="s4__more s4__more--low" type="button" data-modal="2">자세히</button>
+          </div>
+          <img class="s4__mock s4__mock--3" src="assets/s4-mock-3.png" width="1047" height="430" alt="" loading="lazy" decoding="async" />
+          <img class="s4__mock-m s4__mock-m--3" src="assets/s4-mock-3-m@3x.webp" width="299" height="189" alt="" loading="lazy" decoding="async" />
+        </article>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== Section 5 : 플로팅 카드 ===== -->
+<section class="s5" id="s5">
+  <div class="s5__stage">
+    <img class="s5__ellipse" src="assets/s5-ellipse.svg" width="1930" height="1930" alt="" loading="lazy" decoding="async" />
+    <p class="s5__caption h3">확인했다면,<br class="br-m" /> 이제 대화할 차례예요</p>
+    <img class="s5__card s5__card--member"   src="assets/s5-card-member@2x.png"   width="383" alt="" data-depth="0.6" loading="lazy" decoding="async" />
+    <img class="s5__card s5__card--org"      src="assets/s5-card-org@2x.png"      width="216" alt="" data-depth="0.9" loading="lazy" decoding="async" />
+    <img class="s5__card s5__card--table"    src="assets/s5-card-table@2x.webp"    width="435" alt="" data-depth="0.5" loading="lazy" decoding="async" />
+    <img class="s5__card s5__card--squad"    src="assets/s5-card-squad@2x.webp"    width="704" alt="" data-depth="0.4" loading="lazy" decoding="async" />
+    <img class="s5__card s5__card--column"   src="assets/s5-card-column@2x.webp"   width="446" alt="" data-depth="1.0" loading="lazy" decoding="async" />
+    <img class="s5__card s5__card--timeline" src="assets/s5-card-timeline@2x.webp" width="164" alt="" data-depth="0.8" loading="lazy" decoding="async" />
+    <img class="s5__card s5__card--menu"     src="assets/s5-card-menu@2x.webp"     width="346" alt="" data-depth="0.7" loading="lazy" decoding="async" />
+    <img class="s5__card s5__card--drag"     src="assets/s5-card-drag@2x.png"     width="377" alt="" data-depth="1.1" loading="lazy" decoding="async" />
+    <img class="s5__card s5__card--estimate" src="assets/s5-card-estimate@2x.webp" width="589" alt="" data-depth="0.5" loading="lazy" decoding="async" />
+  </div>
+</section>
+
+<!-- ===== Section 6 : 1on1 ===== -->
+<section class="feat feat--s6 wrap" id="features">
+  <div class="feat__head reveal">
+    <h2 class="h1 split-lines">1on1<br />숫자로 시작해 액션 아이템으로 끝나요</h2>
+    <p class="body feat__sub">실제 진척과 자가평가가 얼마나 다른지 보면서,<br />AI가 준비한 7단계 스크립트대로 진행해요.</p>
+  </div>
+  <div class="feat__body">
+    <figure class="feat__figure reveal">
+      <div class="feat__visual s6__visual bg-defer">
+        <img class="s6__navigator" src="assets/s6-navigator@3x.webp" width="527" height="719" alt="" loading="lazy" decoding="async" />
+        <img class="s6__navigator-m" src="assets/s6-nav-m@3x.webp" width="342" height="622" alt="" loading="lazy" decoding="async" />
+        <img class="feat__visual-m" src="assets/s6-visual-m@3x.webp" width="1026" height="1929" alt="" loading="lazy" decoding="async" />
+      </div>
+      <figcaption class="caption">예시 인물과 내용입니다. 스크립트는 매니저 화면에만 보입니다.</figcaption>
+    </figure>
+    <div class="feat__cols reveal">
+      <div class="feat__col">
+        <img src="assets/s6-icon-1.svg" width="40" height="40" alt="" loading="lazy" decoding="async" />
+        <p class="body">1on1 준비 화면에는 팀원의 KR 별 실제 진척이 OKR 에서 자동으로 들어오고, 팀원이 적은 자가평가가 나란히 놓입니다. 둘이 어긋나면 「미팅에서 논의 권장」이 붙어, 느낌이 아니라 정량 목표를 놓고 대화를 시작합니다.</p>
+      </div>
+      <div class="feat__col">
+        <img src="assets/s6-icon-2.svg" width="40" height="40" alt="" loading="lazy" decoding="async" />
+        <p class="body">매니저가 「진행 스크립트 생성」을 누르면 AI 가 브리핑·주제·팀원의 준비 내용·이전 1on1 을 읽고, 아이스브레이킹부터 마무리까지 7단계 스크립트를 만듭니다. 단계마다 권장 시간, 「이렇게 말해 보세요」 멘트, 추천 질문이 들어 있습니다.</p>
+      </div>
+      <div class="feat__col">
+        <img src="assets/s6-icon-3.svg" width="40" height="40" alt="" loading="lazy" decoding="async" />
+        <ul class="body feat__list">
+          <li>미팅 전에 만들어 두면 시작하자마자 단계를 넘기며 읽을 수 있습니다. 준비에 쓰던 시간이 대화로 돌아갑니다.</li>
+          <li>미팅이 끝나면 AI 가 대화에서 담당과 기한이 붙은 액션 아이템을 뽑아 둡니다. 다음 1on1 준비 화면에서 다시 확인하니, 대화가 매번 처음부터 시작되지 않습니다.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Section 7 : AI 피드백 ===== -->
+<section class="feat feat--s7 wrap" id="s7">
+  <div class="feat__head feat__head--s7 reveal">
+    <h2 class="h1 split-lines">AI 피드백<br />기억이 아니라 기록으로 피드백합니다</h2>
+    <p class="body feat__sub">스니핏 · OKR · 1on1 을 근거로<br />AI 가 초안을 만들고, 매니저가 고쳐 보냅니다.<br />받는 사람도 근거를 볼 수 있어 더 공정하다고 느낍니다.</p>
+  </div>
+  <div class="feat__body">
+    <figure class="feat__figure reveal">
+      <div class="feat__visual s7__visual bg-defer">
+        <img class="s7__screen" src="assets/s7-screen@2x.webp" width="1255" height="710" alt="" loading="lazy" decoding="async" />
+        <img class="s7__screen-m" src="assets/s7-screen-m@3x.webp" width="342" height="410" alt="" loading="lazy" decoding="async" />
+        <img class="feat__visual-m" src="assets/s7-visual-m@3x.webp" width="1026" height="1929" alt="" loading="lazy" decoding="async" />
+      </div>
+      <figcaption class="caption">피드백 작성 › ✦ AI 추천 받기 (예시)</figcaption>
+    </figure>
+    <div class="feat__cols reveal">
+      <div class="feat__col">
+        <img src="assets/s7-icon-1.svg" width="40" height="40" alt="" loading="lazy" decoding="async" />
+        <p class="body">피드백을 쓸 때 「✦ AI 추천 받기」를 누르면, AI 가 그 팀원의 스니핏 · OKR 진척 · 1on1 기록을 근거로 상황 · 행동 · 영향(SBI) 형식의 초안을 만듭니다. 매니저는 초안을 고쳐서 보냅니다.</p>
+      </div>
+      <div class="feat__col">
+        <img src="assets/s7-icon-2.svg" width="40" height="40" alt="" loading="lazy" decoding="async" />
+        <ul class="body feat__list">
+          <li>최근 기억에 남은 일만 말하게 되는 편향을 줄입니다. 그 기간에 실제로 한 일이 근거로 함께 묶입니다.</li>
+          <li>피드백이 데이터에 근거해 있으니, 받는 사람도 «왜 이런 피드백인지»를 확인할 수 있고 더 공정하다고 느낍니다.</li>
+        </ul>
+      </div>
+      <div class="feat__col">
+        <img src="assets/s7-icon-3.svg" width="40" height="40" alt="" loading="lazy" decoding="async" />
+        <ul class="body feat__list">
+          <li>칭찬이나 지적으로 끝나지 않고, 다음에 해 주었으면 하는 «기대 행동»까지 적습니다. 팀원은 받은 피드백에 바로 답을 남길 수 있습니다.</li>
+          <li>1on1 에서 나눈 이야기는 피드백으로 이어집니다. 등급이나 순위 없이 대화로 주고받는 상시 피드백입니다.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Section 8 : 데이터 출처 ===== -->
+<section class="feat feat--s8 wrap" id="s8">
+  <div class="feat__head reveal">
+    <h2 class="h1 split-lines">데이터는 어디서 오나<br />보고서를 따로 만들지 않습니다</h2>
+    <p class="body feat__sub">팀이 일하며 이미 남기는 기록이 그대로 근거가 됩니다.</p>
+  </div>
+  <div class="feat__body">
+    <figure class="feat__figure reveal">
+      <div class="feat__visual feat__visual--short s8__visual bg-defer">
+        <img class="glow" src="assets/ellipse-glow.svg" width="1258" height="1258" alt="" loading="lazy" decoding="async" />
+        <img class="s8__sources" src="assets/s8-sources@3x.webp" width="444" height="300" alt="" loading="lazy" decoding="async" />
+        <!-- 점선 위로 데이터가 흘러가는 모션 (SMIL). 선 좌표는 Figma 30:7081 벡터 23~27 — 짧고 밝은 선(앞쪽이 밝고 꼬리는 사라짐) -->
+        <svg class="s8__flow" viewBox="0 0 444 300" aria-hidden="true">
+          <defs>
+            <path id="s8f1" d="M72 208 L225 138" />
+            <path id="s8f2" d="M147 208 L225 138" />
+            <path id="s8f3" d="M225 208 L225 138" />
+            <path id="s8f4" d="M297 208 L225 138" />
+            <path id="s8f5" d="M372 208 L225 138" />
+            <linearGradient id="s8fg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="currentColor" stop-opacity="0" /><stop offset="0.7" stop-color="currentColor" stop-opacity="0.9" /><stop offset="1" stop-color="currentColor" stop-opacity="1" /></linearGradient>
+          </defs>
+            <rect class="s8__flow-dash" x="-22" y="-1" width="22" height="2" rx="1" opacity="0"><animateMotion dur="2.8s" begin="0.00s" repeatCount="indefinite" rotate="auto"><mpath href="#s8f1" /></animateMotion><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.82;1" dur="2.8s" begin="0.00s" repeatCount="indefinite" /></rect>
+            <rect class="s8__flow-dash" x="-22" y="-1" width="22" height="2" rx="1" opacity="0"><animateMotion dur="2.8s" begin="0.50s" repeatCount="indefinite" rotate="auto"><mpath href="#s8f2" /></animateMotion><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.82;1" dur="2.8s" begin="0.50s" repeatCount="indefinite" /></rect>
+            <rect class="s8__flow-dash" x="-22" y="-1" width="22" height="2" rx="1" opacity="0"><animateMotion dur="2.8s" begin="1.00s" repeatCount="indefinite" rotate="auto"><mpath href="#s8f3" /></animateMotion><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.82;1" dur="2.8s" begin="1.00s" repeatCount="indefinite" /></rect>
+            <rect class="s8__flow-dash" x="-22" y="-1" width="22" height="2" rx="1" opacity="0"><animateMotion dur="2.8s" begin="1.50s" repeatCount="indefinite" rotate="auto"><mpath href="#s8f4" /></animateMotion><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.82;1" dur="2.8s" begin="1.50s" repeatCount="indefinite" /></rect>
+            <rect class="s8__flow-dash" x="-22" y="-1" width="22" height="2" rx="1" opacity="0"><animateMotion dur="2.8s" begin="2.00s" repeatCount="indefinite" rotate="auto"><mpath href="#s8f5" /></animateMotion><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.82;1" dur="2.8s" begin="2.00s" repeatCount="indefinite" /></rect>
+        </svg>
+      </div>
+      <figcaption class="caption">협업 도구 연동— 관리자가 회사 단위로 연결하면, 이미 쓰고 있는 도구의 활동이 1on1 브리핑과 스니핏 초안의 재료가 됩니다.</figcaption>
+    </figure>
+    <div class="feat__cols reveal">
+      <div class="feat__col">
+        <img src="assets/icon-asterisk-dark.svg" width="40" height="40" alt="" loading="lazy" decoding="async" />
+        <p class="body">팀원이 하루 한 번 남기는 업무 기록과 헬스체크입니다. 스니핏에 붙인 프로젝트 태그로 투입 비율 추정치를 만듭니다. Jira · GitHub 계정을 이어 두면 [오늘 활동으로 초안 채우기] 한 번으로 그날 활동이 칸마다 채워집니다. → 투입 추정 · AI 브리핑</p>
+      </div>
+      <div class="feat__col">
+        <img src="assets/icon-user-dark.svg" width="40" height="40" alt="" loading="lazy" decoding="async" />
+        <p class="body">지난 대화와 액션 아이템이 다음 1on1 의 맥락이 됩니다. AI 브리핑은 최근 3회의 기록을 함께 읽습니다. → AI 브리핑 · 1on1 추천 어젠다</p>
+      </div>
+      <div class="feat__col">
+        <img src="assets/icon-target-dark.svg" width="40" height="40" alt="" loading="lazy" decoding="async" />
+        <p class="body">내 OKR 의 KR 을 투입 항목으로 불러올 수 있습니다. 매니저는 KR 드릴다운에서 KR 마다 팀원별 기여를 봅니다. → 투입 항목 · KR 드릴다운 · AI 브리핑</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Section 9 : 데일리 스니핏 ===== -->
+<section class="feat feat--s9 wrap" id="s9">
+  <div class="feat__head reveal">
+    <h2 class="h1 split-lines">데일리 스니핏<br />버튼 한 번으로 그날 활동이 초안이 됩니다</h2>
+    <p class="body feat__sub">AI 가 채운 칸은 본인이 확인해야 제출되고,<br />컨디션은 본인이 적습니다.</p>
+  </div>
+  <div class="feat__body">
+    <figure class="feat__figure reveal">
+      <div class="feat__visual s9__visual bg-defer">
+        <img class="s9__modal" src="assets/s9-modal@3x.webp" width="866" height="776" alt="" loading="lazy" decoding="async" />
+        <img class="s9__modal-m" src="assets/s9-modal-m@3x.webp" width="342" height="575" alt="" loading="lazy" decoding="async" />
+        <img class="feat__visual-m" src="assets/s9-visual-m@3x.webp" width="1026" height="1929" alt="" loading="lazy" decoding="async" />
+      </div>
+      <figcaption class="caption">대표에게 올리는 보고서를 따로 만들게 하지 않습니다.<br />하루 기록, 1on1, OKR, 쓰고 있는 협업 도구가 그대로 근거가 됩니다.<br />기록은 조직장과 팀원이 일하면서 직접 남기는 것이고, 관리 부서만 보는 데이터가 아닙니다.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===== Section 10 : 결재/휴가 ===== -->
+<section class="feat feat--s10 wrap" id="s10">
+  <div class="feat__head reveal">
+    <h2 class="h1 split-lines">결재와 휴가도<br />같은 자리에서</h2>
+  </div>
+  <div class="feat__body">
+    <figure class="feat__figure reveal">
+      <div class="feat__visual feat__visual--short s10__visual bg-defer">
+        <img class="glow" src="assets/ellipse-glow.svg" width="1258" height="1258" alt="" loading="lazy" decoding="async" />
+        <div class="s10__pill">
+          <div class="s10__item">
+            <img src="assets/s10-pill-icon-1.svg" width="50" height="50" alt="" loading="lazy" decoding="async" />
+            <span class="headline">워크플로우</span>
+          </div>
+          <div class="s10__item">
+            <img src="assets/s10-pill-icon-2.svg" width="50" height="50" alt="" loading="lazy" decoding="async" />
+            <span class="headline">전자결재</span>
+          </div>
+          <div class="s10__item">
+            <img src="assets/s10-pill-icon-3.svg" width="50" height="50" alt="" loading="lazy" decoding="async" />
+            <span class="headline">휴가 · 연차</span>
+          </div>
+        </div>
+        <img class="s10__badge" src="assets/s10-badge@2x.png" width="112" height="52" alt="곧 출시" loading="lazy" decoding="async" />
+        <img class="s10__badge-m" src="assets/s10-badge-m@2x.png" width="83" height="37" alt="곧 출시" loading="lazy" decoding="async" />
+      </div>
+      <figcaption class="caption">다른 기능과 연결 — 승인된 휴가는 따로 알리지 않아도 곳곳에 반영됩니다.</figcaption>
+    </figure>
+    <div class="feat__cols reveal">
+      <div class="feat__col">
+        <img src="assets/s10-icon-1.svg" width="40" height="40" alt="" loading="lazy" decoding="async" />
+        <h3 class="headline headline--bold">워크플로우</h3>
+        <p class="body body--dark">「100만 원 이상이면 재무팀장 합의 후 대표 승인」처럼 적으면 AI 가 단계를 만들고, 이어서 말로 고칩니다. 개발을 요청하지 않고 관리자가 직접 만듭니다.</p>
+        <div class="feat__sub-item"><strong class="body body--dark">결재형</strong><p class="body">구성원이 기안을 올리면 정한 결재선과 처리 담당자를 거쳐 끝납니다.</p></div>
+        <div class="feat__sub-item"><strong class="body body--dark">자동화형</strong><p class="body">입사일·계약 종료일 같은 날짜나 정해 둔 일정에 맞춰 스스로 돕니다. 예: 계약 종료 30일 전에 조직장에게 재계약 여부를 묻습니다.</p></div>
+        <div class="feat__sub-item"><strong class="body body--dark">미리실행</strong><p class="body">예시 기안이 어느 길로 가는지 단계마다 불을 켜며 보여 줍니다. 비어 있거나 잘못된 설정은 어디를 고치면 되는지 알려 주고, 고치기 전에는 켜지 않습니다.</p></div>
+      </div>
+      <div class="feat__col">
+        <img src="assets/s10-icon-2.svg" width="40" height="40" alt="" loading="lazy" decoding="async" />
+        <h3 class="headline headline--bold">전자결재</h3>
+        <p class="body body--dark">결재선은 회사가 정한 규칙대로 조직장을 찾아 채워집니다. 필요하면 제출 전에 결재자를 바꾸거나 더하고, 회사가 잠가 둔 칸은 그대로 지켜집니다.</p>
+        <ul class="body feat__list">
+          <li>결재자는 알림 하나로 내용을 보고 승인하거나 반려합니다.</li>
+          <li>자리를 비우는 동안의 결재는 지정한 대결자에게 갑니다.</li>
+          <li>휴가·비용 집행·구매·출장·채용·계약 같은 기본 양식에서 시작해 회사에 맞게 고칩니다.</li>
+        </ul>
+      </div>
+      <div class="feat__col">
+        <img src="assets/s10-icon-3.svg" width="40" height="40" alt="" loading="lazy" decoding="async" />
+        <h3 class="headline headline--bold">휴가 · 연차</h3>
+        <p class="body body--dark">입사일 기준이든 회계연도 기준이든 연차를 알아서 부여하고, 쓴 만큼 차감하고, 소멸과 사용 촉진 안내까지 챙깁니다. 휴가 신청은 전자결재로 올라갑니다.</p>
+        <ul class="body feat__list">
+          <li>하루·반차·반반차·시간 단위 중 회사가 쓸 단위를 휴가 종류마다 고릅니다.</li>
+          <li>도입할 때 지금까지의 잔여 연차는 CSV·XLSX 로 한 번에 넣습니다.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="faq wrap reveal" id="faq">
+  <div class="faq__title"><img class="faq__title-d" src="assets/faq-title.svg" width="401" height="107" alt="Frequently asked questions" loading="lazy" decoding="async" /><img class="faq__title-m" src="assets/faq-title-m.svg" width="230" height="61" alt="Frequently asked questions" loading="lazy" decoding="async" /></div>
+  <div class="faq__list">
+    <details class="faq__item">
+      <summary class="faq__q"><span>얼리 액세스는 어떻게 신청하나요?</span><img src="assets/icon-chevron-down.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /></summary>
+      <p class="faq__a body">회사 단위로 신청합니다. 운영팀이 신청 내용을 확인한 뒤, 순서대로 묶어서 초대 메일을 보내 드립니다.</p>
+    </details>
+    <details class="faq__item">
+      <summary class="faq__q"><span>비용이 드나요?</span><img src="assets/icon-chevron-down.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /></summary>
+      <p class="faq__a body">얼리 액세스 기간에는 무료입니다. 정식 출시 후에도 3개월 더 무료로 쓰실 수 있습니다.</p>
+    </details>
+    <details class="faq__item">
+      <summary class="faq__q"><span>전자결재와 휴가 관리도 쓸 수 있나요?</span><img src="assets/icon-chevron-down.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /></summary>
+      <p class="faq__a body">곧 출시합니다. 전자결재·워크플로우·휴가는 기본 요금제와 별도인 «전자결재 · 휴가 패키지»로 제공하고, 출시 시점은 따로 안내해 드립니다.</p>
+    </details>
+    <details class="faq__item">
+      <summary class="faq__q"><span>투입 비율은 누가 정하고, 어디에 쓰이나요?</span><img src="assets/icon-chevron-down.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /></summary>
+      <div class="faq__a body"><p>팀원 본인이 적습니다. 기준은 프로젝트 규모가 아니라 본인의 가용 업무 시간 100%입니다. 스니핏 기록으로 만든 추정치를 참고할 수 있지만, 본인이 저장하기 전에는 반영되지 않습니다.</p><p>이 값은 평가 점수나 인건비 정산에 쓰지 않습니다. 회사의 사람이 어느 일에 쓰이고 있는지, 새 일을 맡길 수 있는 사람이 누구인지 보고 함께 정하기 위한 값입니다.</p></div>
+    </details>
+    <details class="faq__item">
+      <summary class="faq__q"><span>인사 부서만 쓰는 도구인가요?</span><img src="assets/icon-chevron-down.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /></summary>
+      <p class="faq__a body">아닙니다. 대표와 조직장이 조직 현황·OKR·매니저 화면을 직접 보고, 팀원은 스니핏과 투입 비율로 자기 기록을 남깁니다. 정기 평가 운영처럼 회사 전체를 다루는 설정은 관리자 메뉴에 따로 있습니다.</p>
+    </details>
+    <details class="faq__item">
+      <summary class="faq__q"><span>AI 가 알아서 업무를 재배분하나요?</span><img src="assets/icon-chevron-down.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /></summary>
+      <div class="faq__a body"><p>아닙니다. 모든 AI 기능은 사용자가 버튼을 눌렀을 때만 실행되고, AI 가 투입 비율이나 담당을 바꾸지 않습니다. AI 는 상태를 정리하고 1on1 에서 다룰 주제를 제안합니다. 실제 조정은 매니저와 팀원이 이야기한 뒤 팀원이 직접 저장합니다.</p><p>AI 가 쓴 초안은 노란색(확인 전)으로 표시되고, 사람이 확인하면 초록색으로 바뀝니다.</p></div>
+    </details>
+    <details class="faq__item">
+      <summary class="faq__q"><span>대표와 조직장은 누구의 정보를 볼 수 있나요?</span><img src="assets/icon-chevron-down.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /></summary>
+      <div class="faq__a body"><p>조직장은 자신이 맡은 조직의 구성원만 봅니다. 조직장에서 내려오면 그 순간 볼 수 있는 범위도 사라집니다. 볼 자격이 없는 기록은 화면뿐 아니라 AI 입력에도 들어가지 않습니다.</p><p>리소스의 「조직 현황」은 조회 전용이고, 대표는 전사를, 본부장·부문장은 자기 조직을 봅니다. 조직 단위 평균에는 팀원이 직접 추가한 업무 이름이나 KR 제목이 드러나지 않습니다.</p></div>
+    </details>
+    <details class="faq__item">
+      <summary class="faq__q"><span>연동한 도구의 데이터는 어떻게 다루나요?</span><img src="assets/icon-chevron-down.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /></summary>
+      <div class="faq__a body"><p>외부 도구의 접속 토큰은 암호화(AES-256)해 저장합니다. Slack DM 은 직원 본인이 명시적으로 동의한 경우에만 가져오고, 동의를 철회하면 그 동의로 가져온 DM 은 복구할 수 없게 파기합니다.</p><p>연동을 해제하면 새로 가져오는 것만 멈추고, 그동안 가져온 기록은 남습니다. 남은 기록을 지우려면 고객지원으로 요청해 주세요.</p></div>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<!-- 섹션 4 상세 모달 (화면 중앙 오버레이 + 전체 블러 백드롭, Figma 15:8557 / 66:3348 / 15:8727) — GNB 위에 떠야 하므로 body 레벨 -->
+      <div class="s4__backdrop" id="s4-backdrop" aria-hidden="true"></div>
+      <aside class="s4__modal" id="s4-modal" aria-hidden="true">
+        <button class="s4__close" type="button" aria-label="닫기"><img src="assets/icon-x-close-lg.svg" width="33" height="33" alt="" loading="lazy" decoding="async" /></button>
+        <div class="s4__modal-scroll">
+        <div class="s4__modal-body" data-modal-body="0">
+          <h3 class="h3">팀원은 한 달에 한 번</h3>
+          <div class="s4__modal-lead">
+            <p class="headline">자기 업무 시간이 어느 프로젝트와 목표에 쓰였는지 비율로 적습니다. Pivit 은 그 값을 사람·팀·조직 단위로 모아 보여 줍니다.</p>
+            <p class="caption s4__modal-sub">대표는 「조직 현황」 탭에서 전사부터 본부·팀으로 내려가며 조직마다 평균 투입 %와 프로젝트별 비중을 봅니다. 프로젝트 상세의 리소스 탭에서는 참여 인원과 함께, 계획한 비율과 실제로 쓴 비율을 나란히 봅니다.</p>
+          </div>
+          <ul class="s4__checks">
+            <li><img src="assets/icon-check-green.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /><span class="body">투입 항목으로 내 OKR 의 KR 을 불러올 수 있어, 시간이 어느 목표에 쓰였는지도 기록으로 남습니다.</span></li>
+            <li><img src="assets/icon-check-green.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /><span class="body">조직 현황은 조회 전용입니다. 대표는 전사를, 본부장·부문장은 자기 조직을 봅니다.</span></li>
+            <li><img src="assets/icon-check-green.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /><span class="body">조직 단위 평균에는 팀원이 직접 추가한 업무 이름이나 KR 제목이 드러나지 않고 「개인 항목」으로 묶입니다.</span></li>
+          </ul>
+          <div class="s4__rows">
+            <div class="s4__row"><div class="s4__who"><img src="assets/s4-avatar-1@2x.png" width="24" height="24" alt="" loading="lazy" decoding="async" /><b>이도윤</b></div><div class="s4__bars"><div class="s4__bar"><span>계획</span><i><b style="width:28%" class="is-plan"></b></i><em>35%</em></div><div class="s4__bar"><span>실제</span><i><b style="width:70%" class="is-up"></b></i><em>50% <strong class="is-up">+15%p</strong></em></div></div></div>
+            <div class="s4__row"><div class="s4__who"><img src="assets/s4-avatar-2@2x.png" width="24" height="24" alt="" loading="lazy" decoding="async" /><b>김테오</b></div><div class="s4__bars"><div class="s4__bar"><span>계획</span><i><b style="width:36%" class="is-plan"></b></i><em>40%</em></div><div class="s4__bar"><span>실제</span><i><b style="width:36%" class="is-blue"></b></i><em>40% <strong class="is-flat">-</strong></em></div></div></div>
+            <div class="s4__row"><div class="s4__who"><img src="assets/s4-avatar-3@2x.png" width="24" height="24" alt="" loading="lazy" decoding="async" /><b>박서연</b></div><div class="s4__bars"><div class="s4__bar"><span>계획</span><i><b style="width:20%" class="is-plan"></b></i><em>20%</em></div><div class="s4__bar"><span>실제</span><i><b style="width:10%" class="is-down"></b></i><em>10% <strong class="is-down">-10%p</strong></em></div></div></div>
+          </div>
+          <p class="caption">참여 인원 3명 · 계획 합계 95% · 실제 합계 100% (이번 달). 계획과 실제의 차이는 평가 근거가 아니라 대화의 재료입니다.</p>
+        </div>
+        <div class="s4__modal-body" data-modal-body="1" hidden><!-- Figma 48:3034 -->
+          <h3 class="h3">팀원은 한 달에 한 번</h3>
+          <div class="s4__modal-lead">
+            <p class="headline">투입 합계가 70%에 못 미치는 사람에게는 「여유」 상태가 붙습니다. 새 프로젝트를 맡을 수 있다는 뜻입니다. 팀 현황에는 여유 인원 수가 맨 위 카드로 나오고, 조직 현황에서는 구성원마다 상태가 보입니다.</p>
+            <p class="caption s4__modal-sub">투입 비율은 본인의 가용 시간 100%를 기준으로 팀원이 직접 적는 값이고, 일을 어디에 더 맡길지 함께 정하기 위한 재료입니다.</p>
+          </div>
+          <ul class="s4__checks">
+            <li><img src="assets/icon-check-green.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /><span class="body">한 프로젝트에 80% 넘게 묶여 있는 사람은 「쏠림」으로 따로 표시합니다. 다른 일로 넓힐 여지가 있는 사람입니다.</span></li>
+            <li><img src="assets/icon-check-green.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /><span class="body">아직 비율을 적지 않은 사람은 「미입력」으로 조직마다 셉니다. 평균에서는 빼고 계산합니다.</span></li>
+            <li><img src="assets/icon-check-green.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /><span class="body">최근 7일 스니핏에 프로젝트 태그가 3건 이상이면 추정치를 함께 보여 줍니다. 추정치는 참고용이고, 본인이 저장해야 반영됩니다.</span></li>
+          </ul>
+        </div>
+        <div class="s4__modal-body" data-modal-body="2" hidden><!-- Figma 48:3125 -->
+          <h3 class="h3">팀원은 한 달에 한 번</h3>
+          <div class="s4__modal-lead">
+            <p class="headline">달성률만 보는 목표 관리에서는 목표를 낮게 잡을수록 점수가 좋아지고, 팀마다 자기 숫자만 지키게 됩니다. Pivit 은 회사의 큰 목표를 모든 조직이 함께 보고, 팀과 개인이 그 맥락에서 자기 목표를 세우는 OKR 을 기본으로 둡니다. 그래서 투입 비율에 KR 을 불러오면, 누구의 시간이 어느 회사 목표를 향하는지까지 이어서 볼 수 있습니다.</p>
+            <p class="caption s4__modal-sub">AI 는 버튼을 눌렀을 때만 실행됩니다. 스스로 투입값이나 담당을 바꾸지 않습니다. 조직장은 자신이 맡은 조직의 구성원만 볼 수 있고, 볼 자격이 없는 기록은 AI 입력에도 들어가지 않습니다.</p>
+          </div>
+          <ul class="s4__checks">
+            <li><img src="assets/icon-check-green.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /><div class="s4__check-text"><b class="body">목표 세팅</b><span class="body">팀과 개인의 KR 은 위 단계의 KR 을 가리켜 연결됩니다. 설정 화면은 사람마다 「정렬됨」인지, 팀 OKR 이나 상위 OKR 과 끊겨 있는지, 아직 개인 OKR 을 쓰지 않았는지를 보여 줍니다.</span></div></li>
+            <li><img src="assets/icon-check-green.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /><div class="s4__check-text"><b class="body">실시간 점검</b><span class="body">목표 100 에 80 이 나올 일은 일찍 보일수록 대응할 시간이 생깁니다. KR 진척이 갱신되는 대로 OKR 대시보드가 전사부터 팀·개인까지 지금의 진척을 한 화면에 보여 줍니다.</span></div></li>
+            <li><img src="assets/icon-check-green.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /><div class="s4__check-text"><b class="body">KR 드릴다운</b><span class="body">매니저 화면에서 KR 하나를 고르면 그 KR 의 진척률과, 거기에 기여하고 있는 팀원이 함께 나옵니다. 본부장·부문장은 하위 조직으로 내려가며 같은 방식으로 봅니다.</span></div></li>
+            <li><img src="assets/icon-check-green.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /><div class="s4__check-text"><b class="body">AI 브리핑</b><span class="body">조직장이 팀원을 열고 「AI 브리핑 생성」을 누르면, 최근 스니핏·OKR 진척·1on1 기록을 읽고 지금 상태를 2~3문장으로 정리합니다. 다음 1on1 에서 다룰 어젠다를 최대 3개까지 제안합니다.</span></div></li>
+            <li><img src="assets/icon-check-green.svg" width="24" height="24" alt="" loading="lazy" decoding="async" /><div class="s4__check-text"><b class="body">피드백 · 평가</b><span class="body">1on1 과 피드백으로 대화를 이어 가고, 정기 평가 때는 그동안의 OKR·스니핏·받은 피드백·1on1 기록이 근거로 모입니다.</span></div></li>
+          </ul>
+        </div>
+      </div>
+      </aside>
+
+
+<!-- ===== Footer ===== -->
+<footer class="footer" id="early-access">
+  <div class="footer__bg" aria-hidden="true">
+    <img class="footer__bg-top" src="assets/footer-bg-top.webp" alt="" loading="lazy" decoding="async" />
+    <img class="footer__bg-bottom" src="assets/footer-bg-bottom.webp" alt="" loading="lazy" decoding="async" />
+  </div>
+  <div class="wrap footer__inner">
+    <div class="footer__msg">
+      <p class="body">대표를 위한 조직 운영 체제</p>
+      <div class="footer__msg-text">
+        <h2 class="h3">회사의 사람이 어디에 쓰이는지,<br />이번 달부터 보세요</h2>
+        <p class="headline footer__promo">얼리 액세스 기간 무료<br />정식 출시 후 3개월 더 무료</p>
+      </div>
+      <a class="cta" href="mailto:cs@pivit.work?subject=Early%20Access%20%EC%8B%A0%EC%B2%AD">Early Access</a>
+    </div>
+    <div class="footer__legal caption">
+      <div class="footer__company">
+        <p>주식회사 피빗 (PIVIT Inc.)&nbsp;&nbsp;대표자 민현식<br />주소 경기도 고양시 덕양구 화정동 967-3, 709-라3호 (우편번호 10497)<br />이메일 cs@pivit.work&nbsp;&nbsp;호스팅 서비스 제공 Amazon Web Services Korea LLC(AWS)<br />개인정보 보호책임자 민현식 (privacy@pivit.work)</p>
+        <p>© 2026 주식회사 피빗 (PIVIT Inc.) · pivit.work</p>
+      </div>
+      <nav class="footer__links" aria-label="정책 링크">
+        <a href="/privacy/">개인정보 처리방침</a>
+        <a href="/terms/">이용약관</a>
+        <a href="/policy/">운영정책</a>
+        <a href="/google-user-data/">Google 사용자 데이터 이용</a>
+        <a href="/notice/">공고</a>
+        <a href="mailto:cs@pivit.work">문의하기</a>
+      </nav>
+    </div>
+    <div class="footer__logo" aria-hidden="true"><img src="assets/footer-logo.png" width="1258" height="446" alt="" loading="lazy" decoding="async" /></div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollToPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"></script>
+<script src="glass.js?v=20261114a"></script>
+<script src="main.js?v=20261114a"></script>
+</body>
+</html>

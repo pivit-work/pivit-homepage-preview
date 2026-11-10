@@ -1,0 +1,17 @@
+{
+ "no": 1,
+ "category": "general",
+ "title": "주주명부 기준일 설정 공고",
+ "body": "상법 제354조에 따라 아래와 같이 기준일을 정하였으므로 공고합니다.\n\n1. 기준일: [날짜]\n2. 목적: [목적]\n\n주식회사 피빗\n대표이사 [성명]\n\n(시험용 예시 공고입니다. https://pivit.work 처럼 주소가 있어도 링크가 되지 않습니다.)",
+ "publishedAt": "2026-08-28T14:12:23.000Z",
+ "periodBasis": "fixed_date",
+ "periodEndsOn": "2026-09-17",
+ "correctedBy": [
+  {
+   "no": 2
+  },
+  {
+   "no": 4
+  }
+ ]
+}
