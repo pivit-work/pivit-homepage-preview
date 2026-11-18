@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>pivit · 힘펠 방문 미팅</title>
+<style>
+:root{--bg:#f6f7f8;--card:#fff;--strong:#2c3744;--sub:#687079;--line:#e6e8ea;--brand:#2dbd82;--brand-d:#21a67a;--err:#e5484d}
+@media (prefers-color-scheme:dark){:root{--bg:#14171a;--card:#1d2125;--strong:#eef0f2;--sub:#9aa1a9;--line:#2c3238}}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--strong);font-family:-apple-system,'Apple SD Gothic Neo','Pretendard',sans-serif;display:flex;align-items:center;justify-content:center;padding:16px}
+form{width:100%;max-width:360px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px 24px}
+h1{font-size:19px;margin:0 0 6px}p{font-size:14px;color:var(--sub);margin:0 0 18px;line-height:1.5}
+input{width:100%;font-size:16px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:transparent;color:var(--strong)}
+input:focus{outline:2px solid var(--brand);border-color:transparent}
+button{margin-top:12px;width:100%;font-size:15px;font-weight:700;padding:12px;border:0;border-radius:12px;background:var(--brand);color:#fff;cursor:pointer}
+button:hover{background:var(--brand-d)}button:disabled{opacity:.6;cursor:wait}
+.err{color:var(--err);font-size:13px;min-height:18px;margin-top:10px}
+</style></head><body>
+<form id="f" autocomplete="off"><h1>힘펠 방문 미팅 자료</h1><p>전달받은 비밀번호를 입력해 주세요.</p>
+<input id="pw" type="password" placeholder="비밀번호" autofocus aria-label="비밀번호"><button id="b">열기</button><div class="err" id="e"></div></form>
+<script>
+const SALT=Uint8Array.from(atob('6ulbJhtpmgyJBxGIVjCYwg=='),c=>c.charCodeAt(0)),ITER=600000;
+async function open_(k,u){const b=new Uint8Array(await (await fetch(u,{cache:'no-store'})).arrayBuffer());return crypto.subtle.decrypt({name:'AES-GCM',iv:b.slice(0,12)},k,b.slice(12));}
+document.getElementById('f').addEventListener('submit',async ev=>{ev.preventDefault();const btn=document.getElementById('b'),e=document.getElementById('e');btn.disabled=true;e.textContent='';
+ try{const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(document.getElementById('pw').value),'PBKDF2',false,['deriveKey']);
+  const k=await crypto.subtle.deriveKey({name:'PBKDF2',salt:SALT,iterations:ITER,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);
+  const html=new TextDecoder().decode(await open_(k,'p.bin'));const cache={};
+  window.__pv=u=>cache[u]||(cache[u]=open_(k,u).then(x=>URL.createObjectURL(new Blob([x],{type:'video/mp4'}))));
+  document.open();document.write(html);document.close();
+ }catch(_){e.textContent='비밀번호가 맞지 않습니다.';btn.disabled=false;}});
+</script></body></html>
