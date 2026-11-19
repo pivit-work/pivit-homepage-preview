@@ -17,7 +17,7 @@ button:hover{background:var(--brand-d)}button:disabled{opacity:.6;cursor:wait}
 <form id="f" autocomplete="off"><h1>힘펠 방문 미팅 자료</h1><p>전달받은 비밀번호를 입력해 주세요.</p>
 <input id="pw" type="password" placeholder="비밀번호" autofocus aria-label="비밀번호"><button id="b">열기</button><div class="err" id="e"></div></form>
 <script>
-const SALT=Uint8Array.from(atob('6ulbJhtpmgyJBxGIVjCYwg=='),c=>c.charCodeAt(0)),ITER=600000;
+const SALT=Uint8Array.from(atob('C36q0oDWGoQN5uthMAnkxg=='),c=>c.charCodeAt(0)),ITER=600000;
 async function open_(k,u){const b=new Uint8Array(await (await fetch(u,{cache:'no-store'})).arrayBuffer());return crypto.subtle.decrypt({name:'AES-GCM',iv:b.slice(0,12)},k,b.slice(12));}
 document.getElementById('f').addEventListener('submit',async ev=>{ev.preventDefault();const btn=document.getElementById('b'),e=document.getElementById('e');btn.disabled=true;e.textContent='';
  try{const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(document.getElementById('pw').value),'PBKDF2',false,['deriveKey']);
