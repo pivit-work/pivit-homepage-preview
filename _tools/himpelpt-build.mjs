@@ -1,7 +1,8 @@
 // 힘펠 PT 를 비밀번호로 잠근 페이지(/himpelpt/)로 만든다.
 // 사용: node _tools/himpelpt-build.mjs <pivit-himpel-pt.html 경로> <출력 폴더(himpelpt)>   — 비밀번호는 환경변수 HIMPELPT_PASSWORD
 // 이 저장소는 공개라, 출력 폴더에는 암호문만 남긴다. 본문(로고 · 배경 사진을 data URI 로 품음)은 p.bin, 백업 영상은 v/*.bin.
-// 키: PBKDF2-SHA256(600,000회 · 무작위 salt) → AES-256-GCM. 파일 모양: [12바이트 IV][암호문+태그]. 비밀번호를 바꾸려면 새 값으로 다시 돌린다.
+// 키: PBKDF2-SHA256(600,000회 · 무작위 salt) → AES-256-GCM. 파일 모양: [16바이트 salt][12바이트 IV][암호문+태그]. 비밀번호를 바꾸려면 새 값으로 다시 돌린다.
+// salt 를 index.html 이 아니라 각 .bin 앞에 둔다 — 브라우저·CDN 이 옛 index.html 을 들고 있어도 새 p.bin 과 짝이 맞는다.
 import fs from 'node:fs';
 import path from 'node:path';
 import { webcrypto as crypto } from 'node:crypto';
@@ -33,7 +34,7 @@ const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: IT
 async function seal(bytes) {
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, bytes));
-  const o = new Uint8Array(12 + ct.length); o.set(iv); o.set(ct, 12); return o;
+  const o = new Uint8Array(16 + 12 + ct.length); o.set(salt); o.set(iv, 16); o.set(ct, 28); return o;
 }
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(path.join(out, 'v'), { recursive: true });
@@ -59,13 +60,14 @@ button:hover{background:var(--brand-d)}button:disabled{opacity:.6;cursor:wait}
 <form id="f" autocomplete="off"><h1>힘펠 방문 미팅 자료</h1><p>전달받은 비밀번호를 입력해 주세요.</p>
 <input id="pw" type="password" placeholder="비밀번호" autofocus aria-label="비밀번호"><button id="b">열기</button><div class="err" id="e"></div></form>
 <script>
-const SALT=Uint8Array.from(atob('${Buffer.from(salt).toString('base64')}'),c=>c.charCodeAt(0)),ITER=${ITER};
-async function open_(k,u){const b=new Uint8Array(await (await fetch(u,{cache:'no-store'})).arrayBuffer());return crypto.subtle.decrypt({name:'AES-GCM',iv:b.slice(0,12)},k,b.slice(12));}
+const ITER=${ITER},NB='?t='+Date.now();
+async function get_(u){return new Uint8Array(await (await fetch(u+NB,{cache:'no-store'})).arrayBuffer());}
+function dec_(k,b){return crypto.subtle.decrypt({name:'AES-GCM',iv:b.slice(16,28)},k,b.slice(28));}
 document.getElementById('f').addEventListener('submit',async ev=>{ev.preventDefault();const btn=document.getElementById('b'),e=document.getElementById('e');btn.disabled=true;e.textContent='';
- try{const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(document.getElementById('pw').value),'PBKDF2',false,['deriveKey']);
-  const k=await crypto.subtle.deriveKey({name:'PBKDF2',salt:SALT,iterations:ITER,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);
-  const html=new TextDecoder().decode(await open_(k,'p.bin'));const cache={};
-  window.__pv=u=>cache[u]||(cache[u]=open_(k,u).then(x=>URL.createObjectURL(new Blob([x],{type:'video/mp4'}))));
+ try{const pb=await get_('p.bin');const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(document.getElementById('pw').value.trim()),'PBKDF2',false,['deriveKey']);
+  const k=await crypto.subtle.deriveKey({name:'PBKDF2',salt:pb.slice(0,16),iterations:ITER,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);
+  const html=new TextDecoder().decode(await dec_(k,pb));const cache={};
+  window.__pv=u=>cache[u]||(cache[u]=get_(u).then(b=>dec_(k,b)).then(x=>URL.createObjectURL(new Blob([x],{type:'video/mp4'}))));
   document.open();document.write(html);document.close();
  }catch(_){e.textContent='비밀번호가 맞지 않습니다.';btn.disabled=false;}});
 </script></body></html>
