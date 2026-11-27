@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Hey, PV"><meta name="theme-color" content="#0b0b0d"><link rel="apple-touch-icon" sizes="180x180" href="icon.png"><link rel="icon" href="icon.png"><title>Hey, PV</title>
+<style>html,body{margin:0;height:100%;background:#0b0b0d;color:#e8e6e1;font:16px -apple-system,'Apple SD Gothic Neo',sans-serif}
+body{display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;box-sizing:border-box}
+img{width:72px;height:72px;border-radius:18px}p{margin:16px 0 0;line-height:1.5;color:#a9a6a0}
+form{margin-top:20px;display:flex;gap:8px;justify-content:center}[hidden]{display:none!important}
+input{width:180px;padding:12px 14px;border-radius:12px;border:1px solid #2c2b29;background:#151517;color:#e8e6e1;font-size:16px}
+button{padding:12px 16px;border-radius:12px;border:0;background:#e8e6e1;color:#0b0b0d;font-size:16px;font-weight:600}</style></head>
+<body><main><img src="icon.png" alt=""><p id="m">여는 중입니다</p>
+<form id="f" hidden><input id="pw" type="password" autocomplete="off" placeholder="암호" aria-label="암호"><button>열기</button></form></main>
+<script>
+const K='heypv-pw',m=document.getElementById('m'),f=document.getElementById('f');
+const get=()=>{try{return localStorage.getItem(K)}catch(_){return null}},put=v=>{try{localStorage.setItem(K,v)}catch(_){}},del=()=>{try{localStorage.removeItem(K)}catch(_){}};
+async function open_(pw,typed){m.textContent='여는 중입니다';f.hidden=true;
+ try{const b=new Uint8Array(await (await fetch('p.bin?t='+Date.now(),{cache:'no-store'})).arrayBuffer());
+  const k0=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
+  const k=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b.slice(0,16),iterations:600000,hash:'SHA-256'},k0,{name:'AES-GCM',length:256},false,['decrypt']);
+  const h=new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b.slice(16,28)},k,b.slice(28)));
+  put(pw);if(typed)history.replaceState(null,'','#'+encodeURIComponent(pw));
+  document.open();document.write(h);document.close();
+ }catch(_){del();m.textContent='암호가 맞지 않거나 연결이 끊겼습니다. 전달받은 암호를 넣어 주십시오.';f.hidden=false}}
+f.onsubmit=e=>{e.preventDefault();const v=document.getElementById('pw').value.trim();if(v)open_(v,true)};
+const pw=decodeURIComponent(location.hash.slice(1))||get();
+if(pw)open_(pw,false);else{m.textContent='전달받은 암호를 넣어 주십시오.';f.hidden=false}
+</script></body></html>
